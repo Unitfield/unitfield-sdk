@@ -53,7 +53,7 @@ domain: signing in on this site does not sign the person in there, and the other
 Off until you set `UNITFIELD_CLIENT_ID` and `UNITFIELD_SESSION_SECRET`.
 
 1. Register `{UNITFIELD_SITE_URL}/auth/callback` under **Redirect URIs** of your key (for a test key, `http://localhost:3000/auth/callback`).
-2. Set `UNITFIELD_CLIENT_ID` to the OAuth client id of that key's sign-in client.
+2. Set `UNITFIELD_CLIENT_ID` to the OAuth client id of that key's sign-in client. Website > Developers does not display this id yet, so you need it from Unitfield.
 3. Set `UNITFIELD_SESSION_SECRET` to at least 32 random characters (`openssl rand -base64 32`).
 
 The server keeps the customer's tokens in a sealed httpOnly cookie, so the browser never sees them. The header shows the
