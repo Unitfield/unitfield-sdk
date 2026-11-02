@@ -15,7 +15,8 @@ it signs people in with the authorization code flow and **PKCE (S256)**, and it 
    Redirect URIs are matched as exact strings. No wildcards, no fragments, `https` only for a live key.
 2. Optionally, a post-logout URI, if you want the issuer to send the browser back after it ends a session.
 3. The **client id** of the sign-in client the key owns. A key that has redirect URIs owns one public client; a key without any
-   has none. Website > Developers does not display the client id yet.
+   has none. **Website > Developers** shows it as **Sign-in client ID**, under the publishable key, with a copy button, as soon as
+   the key has a redirect URI. It is different for the live and the test key.
 
 The client allows the scopes `openid email offline_access resident:read resident:pay resident:requests applications:read
 applications:write`. Ask only for what the site needs.

@@ -34,7 +34,7 @@ export type CustomerAuthEndpoints = {
 };
 
 export type CustomerAuthOptions = {
-  /** The public OAuth client of your site key (shown next to the key in Website › Developer). */
+  /** The public OAuth client of your site key: "Sign-in client ID" under the key in Website › Developers, shown once the key has a redirect URI. */
   clientId: string;
   /** One of the redirect URIs registered for the site key, exactly. `https`, or `http` on localhost. */
   redirectUri: string | URL;

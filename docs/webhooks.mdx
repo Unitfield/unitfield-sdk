@@ -7,10 +7,23 @@ order: 5
 Webhooks tell your server that something changed, so a cached site can refresh at once instead of waiting for a timer. A
 delivery is an HTTPS `POST` with a JSON body and a signature.
 
-## Where subscriptions come from today
+## Where subscriptions come from
 
-A webhook subscription belongs to an **installed app** and is created through the platform API, with a signed-in staff
-session. With the SDK:
+There are two kinds, and both use the same events, envelope, signature and retries.
+
+**Your site's own endpoints** are created in **Website > Developers**, in the **Webhooks** card. The **Live** and **Test** tabs
+each have their own endpoints, as in Stripe: a live endpoint receives real events as they happen; a test endpoint receives only
+the sample events you send it with **Send test event**, never an event that carries real data. Live addresses are public
+`https` URLs. A test endpoint can also be `http://localhost`, but Unitfield's servers cannot reach your computer: use a public
+`https` address (a tunnel works) to receive test events. The signing secret is shown once when you add the endpoint or make a
+new one; the card also shows recent deliveries and lets you replay a failed one. A site endpoint can subscribe to `site.published`,
+`site.unpublished`, `listing.published`, `listing.updated`, `listing.unpublished` and `inquiry.created`. Webhooks are part of
+the plans that include the Apps API and webhooks.
+
+A sample is marked: its envelope has `"livemode": false` and `"sample": true`, and its ids are placeholders such as
+`lst_sample`. Real events carry `"livemode": true`.
+
+**An installed app's subscriptions** are created through the platform API, with a signed-in staff session. With the SDK:
 
 ```ts
 import { createPlatformClient } from "@unitfield/sdk";
@@ -27,10 +40,8 @@ created.signingSecret; // shown once: store it now
 dead-lettered deliveries and replays. `platform.webhooks.catalog(organizationId)` lists the event names, and `policy` shows the
 retry and timeout policy: read it instead of hard-coding it.
 
-An app is only told about events its approved scopes allow. The events below need `listings:read` or `applications:read`.
-
-**Website > Developers cannot create a subscription for a site you build yourself yet.** Its webhooks card says so. Until it can,
-use the platform API above.
+An app is only told about events its approved scopes allow. The events below need `listings:read` or `applications:read`. Your
+site's own endpoints do not need a scope: they get the six site events listed above, projected to the same public fields.
 
 ## Events a site cares about
 
