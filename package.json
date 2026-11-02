@@ -14,7 +14,9 @@
     "build": "pnpm -r --if-present build",
     "docs:reference": "node scripts/generate-reference.mjs",
     "docs:reference:check": "node scripts/generate-reference.mjs --check",
-    "docs:check": "node scripts/check-docs.mjs"
+    "docs:check": "node scripts/check-docs.mjs",
+    "test:scripts": "node --test \"scripts/*.test.mjs\"",
+    "release:plan": "node scripts/release-plan.mjs"
   },
   "devDependencies": {
     "@mdx-js/mdx": "3.1.1",

@@ -10,9 +10,9 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "pretypecheck": "pnpm --filter \"@unitfield/react^...\" run build",
+    "pretypecheck": "node ../../scripts/ensure-built.mjs @unitfield/sdk packages/sdk",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "pretest": "pnpm --filter \"@unitfield/react^...\" run build",
+    "pretest": "node ../../scripts/ensure-built.mjs @unitfield/sdk packages/sdk",
     "test": "vitest --run --maxWorkers=1",
     "prepack": "npm run build"
   },

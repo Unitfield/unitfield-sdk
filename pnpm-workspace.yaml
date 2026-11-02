@@ -10,5 +10,3 @@ linkWorkspacePackages: true
 # Build scripts we have reviewed. Everything else fails the install until someone looks at it.
 allowBuilds:
   esbuild: true
-  unrs-resolver: true
-  sharp: false

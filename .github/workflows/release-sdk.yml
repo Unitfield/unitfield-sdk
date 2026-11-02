@@ -1,29 +1,62 @@
-name: Release SDK
+name: Release packages
 
-# Publishes @unitfield/sdk when a push to main carries a version npm does not have yet. Bump `version` in
-# packages/sdk/package.json and merge; nothing else is needed. npm trusts this workflow file through trusted publishing
-# (GitHub OIDC), so there is no npm token anywhere, and every release carries provenance.
+# Publishes every public package in packages/ whose version npm does not have yet: bump `version` in the package's package.json
+# and merge to main; nothing else is needed. npm trusts this workflow file through trusted publishing (GitHub OIDC), so there is no
+# npm token anywhere, and every release carries provenance.
+#
+# The file keeps its original name, release-sdk.yml, on purpose: the trusted-publisher entry of each package on npmjs.com names
+# this exact file (and the `npm-release` environment). Renaming it breaks releases until every entry is changed.
+#
+# A package that is not on npm at all is never published here: trusted publishing can only be set up for an existing package, so
+# its first publish is manual. RELEASING.md has the steps.
 
 on:
   push:
     branches:
       - main
     paths:
-      - packages/sdk/**
+      - packages/**
       - pnpm-lock.yaml
+      - scripts/release-plan.mjs
+      - scripts/registry.mjs
       - .github/workflows/release-sdk.yml
+      - .github/actions/publish-package/**
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-sdk
+  group: release-packages
   cancel-in-progress: false
 
 jobs:
-  release:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      sdk: ${{ steps.plan.outputs.sdk }}
+      react: ${{ steps.plan.outputs.react }}
+      create: ${{ steps.plan.outputs.create }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Find out which versions npm does not have yet
+        id: plan
+        run: node scripts/release-plan.mjs
+
+  # One job per package, in dependency order: the React bindings need the SDK on npm, and the starter pins both.
+  sdk:
     name: Publish @unitfield/sdk
+    needs: plan
+    if: needs.plan.outputs.sdk == 'true'
     # npm trusted publishing accepts OIDC tokens from GitHub-hosted runners only.
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -35,54 +68,48 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: ./.github/actions/publish-package
         with:
-          node-version-file: .nvmrc
-          registry-url: https://registry.npmjs.org
+          directory: packages/sdk
 
-      - name: Use an npm that supports trusted publishing
-        run: npm install --global npm@11.16.0
+  react:
+    name: Publish @unitfield/react
+    needs: [plan, sdk]
+    if: ${{ !cancelled() && needs.plan.outputs.react == 'true' && (needs.sdk.result == 'success' || needs.sdk.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Find out whether this version is new
-        id: version
-        shell: bash
-        run: |
-          set -euo pipefail
-          name=$(node -p "require('./packages/sdk/package.json').name")
-          version=$(node -p "require('./packages/sdk/package.json').version")
-          echo "name=$name" >> "$GITHUB_OUTPUT"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          if npm view "$name@$version" version >/dev/null 2>&1; then
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "$name@$version is already on npm; nothing to publish."
-          else
-            echo "publish=true" >> "$GITHUB_OUTPUT"
-            echo "$name@$version is new; it will be tested and published."
-          fi
+      - uses: ./.github/actions/publish-package
+        with:
+          directory: packages/react
 
-      - name: Activate pinned pnpm
-        if: steps.version.outputs.publish == 'true'
-        run: |
-          corepack enable
-          corepack prepare pnpm@11.11.0 --activate
+  create-unitfield-site:
+    name: Publish create-unitfield-site
+    needs: [plan, react]
+    if: ${{ !cancelled() && needs.plan.outputs.create == 'true' && (needs.react.result == 'success' || needs.react.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Install from the lockfile
-        if: steps.version.outputs.publish == 'true'
-        run: pnpm install --frozen-lockfile
-
-      - name: Test (contract check, build, packed consumer)
-        if: steps.version.outputs.publish == 'true'
-        run: pnpm test
-
-      - name: Publish with provenance
-        if: steps.version.outputs.publish == 'true'
-        working-directory: packages/sdk
-        run: npm publish --access public --provenance
-
-      - name: Summary
-        if: always()
-        shell: bash
-        run: |
-          echo "### ${{ steps.version.outputs.name }}@${{ steps.version.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "publish: ${{ steps.version.outputs.publish }}" >> "$GITHUB_STEP_SUMMARY"
+      - uses: ./.github/actions/publish-package
+        with:
+          directory: packages/create-unitfield-site
+          # The starter's pinned @unitfield/* versions are installed from npm by `npx create-unitfield-site`, so they must be there.
+          # The scaffold smoke test then builds and runs the starter from this very commit.
+          before-publish: |
+            node packages/create-unitfield-site/scripts/check-pins.mjs
+            pnpm build
+            node packages/create-unitfield-site/scripts/smoke.mjs

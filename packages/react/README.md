@@ -76,7 +76,7 @@ import { createStorefrontClient } from "@unitfield/sdk";
 import { Homes } from "./homes"; // a client component that calls useListings
 
 export default async function Page() {
-  const storefront = createStorefrontClient({ publishableKey: process.env.NEXT_PUBLIC_UNITFIELD_PUBLISHABLE_KEY!, fetchOptions: { next: { revalidate: 60 } } });
+  const storefront = createStorefrontClient({ publishableKey: process.env.UNITFIELD_PUBLISHABLE_KEY!, fetchOptions: { next: { revalidate: 60 } } });
   const initialData = await storefront.listings.list({ limit: 12 });
   return <Homes initialData={initialData} />;
 }

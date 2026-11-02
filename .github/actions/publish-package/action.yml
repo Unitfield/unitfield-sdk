@@ -1,0 +1,78 @@
+name: Publish a package
+description: >
+  Tests one workspace package and publishes it to npm with provenance, through trusted publishing (GitHub OIDC; there is
+  no npm token anywhere). The calling job must run on a GitHub-hosted runner with `id-token: write`, and must have checked
+  the repository out. Whether to publish at all is decided before, by scripts/release-plan.mjs.
+
+inputs:
+  directory:
+    description: The package directory, for example packages/react.
+    required: true
+  before-publish:
+    description: An optional shell command that must succeed before publishing.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      with:
+        node-version-file: .nvmrc
+        registry-url: https://registry.npmjs.org
+
+    - name: Use an npm that supports trusted publishing
+      shell: bash
+      run: npm install --global npm@11.16.0
+
+    - name: Activate pinned pnpm
+      shell: bash
+      run: |
+        corepack enable
+        corepack prepare pnpm@11.11.0 --activate
+
+    - name: Install from the lockfile
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Name the package
+      id: package
+      shell: bash
+      env:
+        DIRECTORY: ${{ inputs.directory }}
+      run: |
+        set -euo pipefail
+        echo "name=$(node -p "require('./$DIRECTORY/package.json').name")" >> "$GITHUB_OUTPUT"
+        echo "version=$(node -p "require('./$DIRECTORY/package.json').version")" >> "$GITHUB_OUTPUT"
+
+    - name: Typecheck and test
+      shell: bash
+      env:
+        PACKAGE: ${{ steps.package.outputs.name }}
+      run: |
+        set -euo pipefail
+        pnpm --filter "$PACKAGE" run typecheck
+        pnpm --filter "$PACKAGE" test
+
+    - name: Check what has to be true before publishing
+      if: inputs.before-publish != ''
+      shell: bash
+      env:
+        COMMAND: ${{ inputs.before-publish }}
+      run: bash -euo pipefail -c "$COMMAND"
+
+    - name: Publish with provenance
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: npm publish --access public --provenance
+
+    - name: Summary
+      if: always()
+      shell: bash
+      env:
+        NAME: ${{ steps.package.outputs.name }}
+        VERSION: ${{ steps.package.outputs.version }}
+        JOB_STATUS: ${{ job.status }}
+      run: |
+        echo "### ${NAME}@${VERSION}: ${JOB_STATUS}" >> "$GITHUB_STEP_SUMMARY"

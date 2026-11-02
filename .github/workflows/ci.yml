@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   test:
-    name: Test
+    name: Build, typecheck and test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -31,8 +31,47 @@ jobs:
       - name: Install from the lockfile
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
+      - name: Build every package and example
+        run: pnpm build
+
+      - name: Typecheck every package and example
         run: pnpm typecheck
 
-      - name: Test (contract check, build, packed consumer)
+      - name: Test every package (SDK contract check, packed consumer, React, scaffolder)
         run: pnpm test
+
+      - name: Test the release scripts
+        run: pnpm test:scripts
+
+      - name: Check the docs (MDX, links, generated API reference)
+        run: pnpm docs:check
+
+  scaffold:
+    name: Scaffold smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Activate pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.11.0 --activate
+
+      - name: Install from the lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the packages
+        run: pnpm build
+
+      # Generates the starter into a temp directory, installs it with the packed local @unitfield/sdk and @unitfield/react,
+      # runs `tsc` and `next build` with no environment, then starts it against a mock API and a mock sign-in issuer and
+      # checks pages, caching, webhooks and the PKCE sign-in round trip.
+      - name: Scaffold, install, build and run the starter
+        run: node packages/create-unitfield-site/scripts/smoke.mjs

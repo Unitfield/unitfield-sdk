@@ -4,7 +4,14 @@ updates:
     directory: /
     schedule:
       interval: weekly
+  # The starter's own pinned dependencies are not part of the pnpm workspace.
+  - package-ecosystem: npm
+    directory: /packages/create-unitfield-site/template
+    schedule:
+      interval: weekly
   - package-ecosystem: github-actions
-    directory: /
+    directories:
+      - /
+      - /.github/actions/publish-package
     schedule:
       interval: weekly
