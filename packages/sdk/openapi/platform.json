@@ -676,7 +676,7 @@
         ],
         "summary": "Get the app installation reconciliation report",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectOperations_GetReconciliation",
+        "operationId": "AppOperations_GetReconciliation",
         "parameters": [
           {
             "name": "X-Tenant-Id",
@@ -1571,7 +1571,7 @@
         ],
         "summary": "Get an installation's API usage",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectUsage_GetApplicationUsage",
+        "operationId": "AppUsage_GetApplicationUsage",
         "parameters": [
           {
             "name": "installationId",
@@ -1721,7 +1721,7 @@
         ],
         "summary": "List an installation's webhooks",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_List",
+        "operationId": "AppWebhooks_List",
         "parameters": [
           {
             "name": "installationId",
@@ -1890,7 +1890,7 @@
         ],
         "summary": "Create a webhook",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_Create",
+        "operationId": "AppWebhooks_Create",
         "parameters": [
           {
             "name": "installationId",
@@ -2069,7 +2069,7 @@
         ],
         "summary": "Get a webhook",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_Get",
+        "operationId": "AppWebhooks_Get",
         "parameters": [
           {
             "name": "installationId",
@@ -2227,7 +2227,7 @@
         ],
         "summary": "Update a webhook",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_Update",
+        "operationId": "AppWebhooks_Update",
         "parameters": [
           {
             "name": "installationId",
@@ -2395,7 +2395,7 @@
         ],
         "summary": "Delete a webhook",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_Delete",
+        "operationId": "AppWebhooks_Delete",
         "parameters": [
           {
             "name": "installationId",
@@ -2548,7 +2548,7 @@
         ],
         "summary": "List failed webhook deliveries",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_ListDeadLetters",
+        "operationId": "AppWebhooks_ListDeadLetters",
         "parameters": [
           {
             "name": "installationId",
@@ -2735,7 +2735,7 @@
         ],
         "summary": "List webhook deliveries",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_ListDeliveries",
+        "operationId": "AppWebhooks_ListDeliveries",
         "parameters": [
           {
             "name": "installationId",
@@ -2923,7 +2923,7 @@
         ],
         "summary": "Replay a webhook delivery",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_ReplayDelivery",
+        "operationId": "AppWebhooks_ReplayDelivery",
         "parameters": [
           {
             "name": "installationId",
@@ -3100,7 +3100,7 @@
         ],
         "summary": "Rotate a webhook signing secret",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_RotateSecret",
+        "operationId": "AppWebhooks_RotateSecret",
         "parameters": [
           {
             "name": "installationId",
@@ -3265,7 +3265,7 @@
         ],
         "summary": "Send a test webhook event",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_SendTest",
+        "operationId": "AppWebhooks_SendTest",
         "parameters": [
           {
             "name": "installationId",
@@ -5040,7 +5040,7 @@
         ],
         "summary": "List webhook events",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_ListEventCatalog",
+        "operationId": "AppWebhooks_ListEventCatalog",
         "parameters": [
           {
             "name": "X-Tenant-Id",
@@ -5235,7 +5235,7 @@
         ],
         "summary": "Get the webhook delivery policy",
         "description": "App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.",
-        "operationId": "ConnectWebhooks_GetDeliveryPolicy",
+        "operationId": "AppWebhooks_GetDeliveryPolicy",
         "parameters": [
           {
             "name": "X-Tenant-Id",

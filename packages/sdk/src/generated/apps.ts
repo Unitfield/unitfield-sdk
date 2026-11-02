@@ -16,7 +16,7 @@ export interface paths {
          * Queue a reviewed rental availability action
          * @description App-only runtime operation. Provide the current installation's client-credentials token; 'X-Tenant-Id' is not required. The extension must declare rental.availability.check.v1. Only the exact reviewed request and input fields are accepted; duplicate fields, arbitrary input JSON and internal IDs are rejected. The idempotency key replays only the identical action, input and grant generation. The response is queued work, and its result is available only while that grant remains current.
          */
-        post: operations["Connect_AppActions_Enqueue"];
+        post: operations["Apps_AppActions_Enqueue"];
         delete?: never;
         options?: never;
         head?: never;
@@ -34,7 +34,7 @@ export interface paths {
          * Get an app action
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        get: operations["Connect_AppActions_Get"];
+        get: operations["Apps_AppActions_Get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -56,7 +56,7 @@ export interface paths {
          * Create lease Checkout Session for Payment Element
          * @description Creates a Checkout Session with ui_mode=elements for a lease payment. Initialize CheckoutElementsProvider with the returned clientSecret and stripeAccountId, then call checkout.confirm() to submit. Fulfillment remains provider-confirmed webhook and payment-status authority.
          */
-        post: operations["Connect_Payments_CreateLeaseCheckoutSession"];
+        post: operations["Apps_Payments_CreateLeaseCheckoutSession"];
         delete?: never;
         options?: never;
         head?: never;
@@ -74,7 +74,7 @@ export interface paths {
          * List published listings
          * @description App runtime operation. The resolved app installation supplies tenant context; 'X-Tenant-Id' is not required.
          */
-        get: operations["Connect_Listings_ListUnits"];
+        get: operations["Apps_Listings_ListUnits"];
         put?: never;
         post?: never;
         delete?: never;
@@ -94,7 +94,7 @@ export interface paths {
          * Get one published listing
          * @description Looks the listing up by listingPublicId, the id returned in every list item's listingPublicId field. The unitPublicId is not accepted here.
          */
-        get: operations["Connect_Listings_GetListing"];
+        get: operations["Apps_Listings_GetListing"];
         put?: never;
         post?: never;
         delete?: never;
@@ -114,7 +114,7 @@ export interface paths {
          * Get the organization context
          * @description App runtime operation. The resolved app installation supplies tenant context; 'X-Tenant-Id' is not required.
          */
-        get: operations["Connect_Organization_Get"];
+        get: operations["Apps_Organization_Get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -134,7 +134,7 @@ export interface paths {
          * Get a payment
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        get: operations["Connect_Payments_GetPayment"];
+        get: operations["Apps_Payments_GetPayment"];
         put?: never;
         post?: never;
         delete?: never;
@@ -154,7 +154,7 @@ export interface paths {
          * Get online payment readiness
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        get: operations["Connect_Payments_GetReadiness"];
+        get: operations["Apps_Payments_GetReadiness"];
         put?: never;
         post?: never;
         delete?: never;
@@ -176,7 +176,7 @@ export interface paths {
          * Create screening Checkout Session for Payment Element
          * @description Creates a Checkout Session with ui_mode=elements for the applicant's Payment Element. Initialize CheckoutElementsProvider with the returned clientSecret and stripeAccountId, then call checkout.confirm() to submit. Fulfillment remains provider-confirmed webhook and payment-status authority.
          */
-        post: operations["Connect_Payments_CreateScreeningCheckoutSession"];
+        post: operations["Apps_Payments_CreateScreeningCheckoutSession"];
         delete?: never;
         options?: never;
         head?: never;
@@ -194,7 +194,7 @@ export interface paths {
          * Get a rental application draft
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        get: operations["Connect_RentalApplications_GetDraft"];
+        get: operations["Apps_RentalApplications_GetDraft"];
         put?: never;
         post?: never;
         delete?: never;
@@ -216,7 +216,7 @@ export interface paths {
          * Upload a rental application attachment
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        post: operations["Connect_RentalApplications_UploadAttachment"];
+        post: operations["Apps_RentalApplications_UploadAttachment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -235,7 +235,7 @@ export interface paths {
          * Save a rental application step
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        put: operations["Connect_RentalApplications_SaveStep"];
+        put: operations["Apps_RentalApplications_SaveStep"];
         post?: never;
         delete?: never;
         options?: never;
@@ -256,7 +256,7 @@ export interface paths {
          * Submit a rental application
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        post: operations["Connect_RentalApplications_Submit"];
+        post: operations["Apps_RentalApplications_Submit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -276,7 +276,7 @@ export interface paths {
          * Send a verification code to the applicant
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        post: operations["Connect_RentalApplications_SendOtp"];
+        post: operations["Apps_RentalApplications_SendOtp"];
         delete?: never;
         options?: never;
         head?: never;
@@ -296,7 +296,7 @@ export interface paths {
          * Verify the applicant's code
          * @description App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.
          */
-        post: operations["Connect_RentalApplications_VerifyOtp"];
+        post: operations["Apps_RentalApplications_VerifyOtp"];
         delete?: never;
         options?: never;
         head?: never;
@@ -638,7 +638,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    Connect_AppActions_Enqueue: {
+    Apps_AppActions_Enqueue: {
         parameters: {
             query?: never;
             header?: never;
@@ -743,7 +743,7 @@ export interface operations {
             };
         };
     };
-    Connect_AppActions_Get: {
+    Apps_AppActions_Get: {
         parameters: {
             query?: never;
             header?: never;
@@ -847,7 +847,7 @@ export interface operations {
             };
         };
     };
-    Connect_Payments_CreateLeaseCheckoutSession: {
+    Apps_Payments_CreateLeaseCheckoutSession: {
         parameters: {
             query?: never;
             header: {
@@ -957,7 +957,7 @@ export interface operations {
             };
         };
     };
-    Connect_Listings_ListUnits: {
+    Apps_Listings_ListUnits: {
         parameters: {
             query?: {
                 AvailableFrom?: string;
@@ -1068,7 +1068,7 @@ export interface operations {
             };
         };
     };
-    Connect_Listings_GetListing: {
+    Apps_Listings_GetListing: {
         parameters: {
             query?: never;
             header?: never;
@@ -1172,7 +1172,7 @@ export interface operations {
             };
         };
     };
-    Connect_Organization_Get: {
+    Apps_Organization_Get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1273,7 +1273,7 @@ export interface operations {
             };
         };
     };
-    Connect_Payments_GetPayment: {
+    Apps_Payments_GetPayment: {
         parameters: {
             query?: never;
             header?: never;
@@ -1377,7 +1377,7 @@ export interface operations {
             };
         };
     };
-    Connect_Payments_GetReadiness: {
+    Apps_Payments_GetReadiness: {
         parameters: {
             query?: never;
             header?: never;
@@ -1478,7 +1478,7 @@ export interface operations {
             };
         };
     };
-    Connect_Payments_CreateScreeningCheckoutSession: {
+    Apps_Payments_CreateScreeningCheckoutSession: {
         parameters: {
             query?: never;
             header: {
@@ -1588,7 +1588,7 @@ export interface operations {
             };
         };
     };
-    Connect_RentalApplications_GetDraft: {
+    Apps_RentalApplications_GetDraft: {
         parameters: {
             query?: never;
             header?: never;
@@ -1698,7 +1698,7 @@ export interface operations {
             };
         };
     };
-    Connect_RentalApplications_UploadAttachment: {
+    Apps_RentalApplications_UploadAttachment: {
         parameters: {
             query?: never;
             header?: never;
@@ -1812,7 +1812,7 @@ export interface operations {
             };
         };
     };
-    Connect_RentalApplications_SaveStep: {
+    Apps_RentalApplications_SaveStep: {
         parameters: {
             query?: never;
             header?: never;
@@ -1927,7 +1927,7 @@ export interface operations {
             };
         };
     };
-    Connect_RentalApplications_Submit: {
+    Apps_RentalApplications_Submit: {
         parameters: {
             query?: never;
             header: {
@@ -2036,7 +2036,7 @@ export interface operations {
             };
         };
     };
-    Connect_RentalApplications_SendOtp: {
+    Apps_RentalApplications_SendOtp: {
         parameters: {
             query?: never;
             header?: never;
@@ -2141,7 +2141,7 @@ export interface operations {
             };
         };
     };
-    Connect_RentalApplications_VerifyOtp: {
+    Apps_RentalApplications_VerifyOtp: {
         parameters: {
             query?: never;
             header?: never;

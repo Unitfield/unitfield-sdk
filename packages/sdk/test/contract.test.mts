@@ -43,10 +43,7 @@ function check(doc: Document, call: Call, label: string): string {
     assert.ok(call.headers.has(p.name), `${label}: required header "${p.name}" is missing`);
   }
   if (call.headers.has("idempotency-key")) {
-    // CustomerApplications_Submit requires the header (the API answers 400 without it) and says so in its summary, but the
-    // document does not list it as a parameter yet.
-    const statedInSummary = /idempotency-key header required/i.test(operation.summary ?? "");
-    assert.ok(statedInSummary || declared("header").some((p) => p.name.toLowerCase() === "idempotency-key"), `${label}: ${call.method} ${template} does not declare Idempotency-Key, so the API would ignore it`);
+    assert.ok(declared("header").some((p) => p.name.toLowerCase() === "idempotency-key"), `${label}: ${call.method} ${template} does not declare Idempotency-Key, so the API would ignore it`);
   }
   const requestBody = operation.requestBody?.content?.["application/json"];
   if (!requestBody) {
@@ -245,7 +242,6 @@ function applicantInvocations(fetch: typeof globalThis.fetch) {
     status: () => c.status(draftId),
     screening: () => c.screening(draftId),
     openSigningSession: () => c.openSigningSession(draftId),
-    residentHandoff: () => c.residentHandoff(draftId, { recipientChallengeSha256: "s", issuanceKey: "k", intentExpiresAtUtc: "2026-11-02T00:00:00Z" }),
   };
 }
 

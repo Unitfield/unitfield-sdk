@@ -198,7 +198,7 @@ export interface paths {
          * Get an installation's API usage
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectUsage_GetApplicationUsage"];
+        get: operations["AppUsage_GetApplicationUsage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -218,13 +218,13 @@ export interface paths {
          * List an installation's webhooks
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectWebhooks_List"];
+        get: operations["AppWebhooks_List"];
         put?: never;
         /**
          * Create a webhook
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        post: operations["ConnectWebhooks_Create"];
+        post: operations["AppWebhooks_Create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -242,18 +242,18 @@ export interface paths {
          * Get a webhook
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectWebhooks_Get"];
+        get: operations["AppWebhooks_Get"];
         /**
          * Update a webhook
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        put: operations["ConnectWebhooks_Update"];
+        put: operations["AppWebhooks_Update"];
         post?: never;
         /**
          * Delete a webhook
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        delete: operations["ConnectWebhooks_Delete"];
+        delete: operations["AppWebhooks_Delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -270,7 +270,7 @@ export interface paths {
          * List failed webhook deliveries
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectWebhooks_ListDeadLetters"];
+        get: operations["AppWebhooks_ListDeadLetters"];
         put?: never;
         post?: never;
         delete?: never;
@@ -290,7 +290,7 @@ export interface paths {
          * List webhook deliveries
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectWebhooks_ListDeliveries"];
+        get: operations["AppWebhooks_ListDeliveries"];
         put?: never;
         post?: never;
         delete?: never;
@@ -312,7 +312,7 @@ export interface paths {
          * Replay a webhook delivery
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        post: operations["ConnectWebhooks_ReplayDelivery"];
+        post: operations["AppWebhooks_ReplayDelivery"];
         delete?: never;
         options?: never;
         head?: never;
@@ -332,7 +332,7 @@ export interface paths {
          * Rotate a webhook signing secret
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        post: operations["ConnectWebhooks_RotateSecret"];
+        post: operations["AppWebhooks_RotateSecret"];
         delete?: never;
         options?: never;
         head?: never;
@@ -352,7 +352,7 @@ export interface paths {
          * Send a test webhook event
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        post: operations["ConnectWebhooks_SendTest"];
+        post: operations["AppWebhooks_SendTest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -370,7 +370,7 @@ export interface paths {
          * Get the app installation reconciliation report
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectOperations_GetReconciliation"];
+        get: operations["AppOperations_GetReconciliation"];
         put?: never;
         post?: never;
         delete?: never;
@@ -630,7 +630,7 @@ export interface paths {
          * List webhook events
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectWebhooks_ListEventCatalog"];
+        get: operations["AppWebhooks_ListEventCatalog"];
         put?: never;
         post?: never;
         delete?: never;
@@ -650,7 +650,7 @@ export interface paths {
          * Get the webhook delivery policy
          * @description App management operation. Use a user authorization-code token, provide 'X-Tenant-Id', and satisfy tenant permissions.
          */
-        get: operations["ConnectWebhooks_GetDeliveryPolicy"];
+        get: operations["AppWebhooks_GetDeliveryPolicy"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2161,7 +2161,7 @@ export interface operations {
             };
         };
     };
-    ConnectUsage_GetApplicationUsage: {
+    AppUsage_GetApplicationUsage: {
         parameters: {
             query?: never;
             header: {
@@ -2268,7 +2268,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_List: {
+    AppWebhooks_List: {
         parameters: {
             query?: never;
             header: {
@@ -2375,7 +2375,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_Create: {
+    AppWebhooks_Create: {
         parameters: {
             query?: never;
             header: {
@@ -2486,7 +2486,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_Get: {
+    AppWebhooks_Get: {
         parameters: {
             query?: never;
             header: {
@@ -2595,7 +2595,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_Update: {
+    AppWebhooks_Update: {
         parameters: {
             query?: never;
             header: {
@@ -2708,7 +2708,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_Delete: {
+    AppWebhooks_Delete: {
         parameters: {
             query?: never;
             header: {
@@ -2815,7 +2815,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_ListDeadLetters: {
+    AppWebhooks_ListDeadLetters: {
         parameters: {
             query?: {
                 limit?: number | string;
@@ -2926,7 +2926,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_ListDeliveries: {
+    AppWebhooks_ListDeliveries: {
         parameters: {
             query?: {
                 limit?: number | string;
@@ -3037,7 +3037,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_ReplayDelivery: {
+    AppWebhooks_ReplayDelivery: {
         parameters: {
             query?: never;
             header: {
@@ -3148,7 +3148,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_RotateSecret: {
+    AppWebhooks_RotateSecret: {
         parameters: {
             query?: never;
             header: {
@@ -3257,7 +3257,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_SendTest: {
+    AppWebhooks_SendTest: {
         parameters: {
             query?: never;
             header: {
@@ -3366,7 +3366,7 @@ export interface operations {
             };
         };
     };
-    ConnectOperations_GetReconciliation: {
+    AppOperations_GetReconciliation: {
         parameters: {
             query?: never;
             header: {
@@ -4742,7 +4742,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_ListEventCatalog: {
+    AppWebhooks_ListEventCatalog: {
         parameters: {
             query?: never;
             header: {
@@ -4846,7 +4846,7 @@ export interface operations {
             };
         };
     };
-    ConnectWebhooks_GetDeliveryPolicy: {
+    AppWebhooks_GetDeliveryPolicy: {
         parameters: {
             query?: never;
             header: {

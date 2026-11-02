@@ -197,26 +197,19 @@ test("applicant: submit requires a caller-chosen idempotency key, as the API ans
   assert.equal(calls[0].headers.get("Idempotency-Key"), "submit-1");
 });
 
-test("applicant: status, screening handoff, signing and resident hand-off routes", async () => {
+test("applicant: status, screening handoff and signing routes", async () => {
   const { calls, fetch } = recorder();
   const client = createApplicantClient({ baseUrl, accessToken: "t", fetch });
   await client.status("app_1");
   await client.screening("app_1");
   await client.openSigningSession("app_1");
-  await client.residentHandoff("app_1", { recipientChallengeSha256: "s", issuanceKey: "k", intentExpiresAtUtc: "2026-11-02T00:00:00Z", receiptOnly: true });
-  await client.residentHandoff("app_1", { recipientChallengeSha256: "s", issuanceKey: "k", intentExpiresAtUtc: "2026-11-02T00:00:00Z" });
   await client.recordConsent("draft_1", { acknowledgedApplicantPrivacy: true, consentedToElectronicRecords: true, applicantPrivacyDocumentId: "d", applicantPrivacyVersion: "1", applicantPrivacyContentSha256: "s", electronicRecordsDocumentId: "d", electronicRecordsVersion: "1", electronicRecordsContentSha256: "s" });
   assert.deepEqual(calls.map((c) => `${c.method} ${c.url.pathname}`), [
     "GET /api/customer/v1/applications/app_1/status",
     "GET /api/customer/v1/applications/app_1/screening",
     "POST /api/customer/v1/applications/app_1/signing-session",
-    "POST /api/customer/v1/applications/app_1/resident-handoff",
-    "POST /api/customer/v1/applications/app_1/resident-handoff",
     "PUT /api/customer/v1/applications/drafts/draft_1/consent",
   ]);
-  assert.equal((calls[3].body as { receiptOnly: boolean }).receiptOnly, true);
-  // The API requires the flag; omitting it means the default, `false`.
-  assert.equal((calls[4].body as { receiptOnly: boolean }).receiptOnly, false);
 });
 
 // ---- platform management -----------------------------------------------------------------------------------------

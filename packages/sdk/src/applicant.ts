@@ -72,11 +72,6 @@ export type ApplicationStatus = Wire<Schemas["CustomerApplicationStatusResponse"
 /** Hand-off to the hosted signing page; the applicant continues there. */
 export type SigningSession = Schemas["NativeApplicantSigningSession"];
 
-/** The one-time proof that continues the applicant into Unitfield Resident. `receiptOnly` defaults to false. */
-export type ResidentHandoffInput = Omit<Schemas["MintApplicantResidentProofRequest"], "receiptOnly"> & { receiptOnly?: boolean };
-
-export type ResidentHandoff = Schemas["MintApplicantResidentProofResponse"];
-
 export type ApplicantClientOptions = BearerClientOptions;
 
 /** The signed-in applicant's own applications. Authenticate with a customer token: pass `session.tokenProvider`. */
@@ -160,11 +155,6 @@ export class ApplicantClient extends ApiClient {
   /** Opens the embedded signing session for the applicant's agreement. Redirect the applicant to `signUrl`. */
   async openSigningSession(applicationId: string, options: RequestOptions = {}): Promise<SigningSession> {
     return this.http.request({ ...options, method: "POST", path: `${BASE}/${pathSegment(applicationId, "applicationId")}/signing-session` });
-  }
-
-  /** Mints the one-time proof that continues the applicant into Unitfield Resident. */
-  async residentHandoff(applicationId: string, input: ResidentHandoffInput, options: RequestOptions = {}): Promise<ResidentHandoff> {
-    return this.http.request({ ...options, method: "POST", path: `${BASE}/${pathSegment(applicationId, "applicationId")}/resident-handoff`, body: { ...input, receiptOnly: input.receiptOnly ?? false } });
   }
 }
 

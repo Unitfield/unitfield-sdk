@@ -1283,6 +1283,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Stable key for replaying the same task-request intent.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -1514,154 +1523,6 @@
           },
           "503": {
             "description": "Service unavailable",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "x-unitfield-authenticated": true,
-        "x-unitfield-permission-groups": [],
-        "x-unitfield-record-scoped": false,
-        "x-unitfield-tenant-header-required": false
-      }
-    },
-    "/api/customer/v1/applications/{applicationId}/resident-handoff": {
-      "post": {
-        "tags": [
-          "customer-applications"
-        ],
-        "summary": "Mint the one-time proof that continues the applicant into Unitfield Resident",
-        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
-        "operationId": "CustomerApplications_MintResidentHandoff",
-        "parameters": [
-          {
-            "name": "applicationId",
-            "in": "path",
-            "description": "Resource identifier (UUID).",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MintApplicantResidentProofRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MintApplicantResidentProofResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (validation/format errors)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized (missing/invalid credentials)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden (insufficient permissions)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Gone",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable entity (domain validation)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2784,46 +2645,6 @@
         }
       },
       "JsonElement": {},
-      "MintApplicantResidentProofRequest": {
-        "required": [
-          "recipientChallengeSha256",
-          "issuanceKey",
-          "intentExpiresAtUtc"
-        ],
-        "type": "object",
-        "properties": {
-          "recipientChallengeSha256": {
-            "type": "string"
-          },
-          "issuanceKey": {
-            "type": "string"
-          },
-          "intentExpiresAtUtc": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "receiptOnly": {
-            "type": "boolean",
-            "default": false
-          }
-        }
-      },
-      "MintApplicantResidentProofResponse": {
-        "required": [
-          "proofId",
-          "expiresAtUtc"
-        ],
-        "type": "object",
-        "properties": {
-          "proofId": {
-            "type": "string"
-          },
-          "expiresAtUtc": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "NativeApplicantSigningSession": {
         "required": [
           "clientId",

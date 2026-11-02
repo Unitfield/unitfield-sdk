@@ -23,26 +23,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/customer/v1/applications/{applicationId}/resident-handoff": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Mint the one-time proof that continues the applicant into Unitfield Resident
-         * @description User-scoped/public operation. 'X-Tenant-Id' not required.
-         */
-        post: operations["CustomerApplications_MintResidentHandoff"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/customer/v1/applications/{applicationId}/screening": {
         parameters: {
             query?: never;
@@ -444,19 +424,6 @@ export interface components {
             updatedAtUtc: string;
         };
         JsonElement: unknown;
-        MintApplicantResidentProofRequest: {
-            /** Format: date-time */
-            intentExpiresAtUtc: string;
-            issuanceKey: string;
-            /** @default false */
-            receiptOnly: boolean;
-            recipientChallengeSha256: string;
-        };
-        MintApplicantResidentProofResponse: {
-            /** Format: date-time */
-            expiresAtUtc: string;
-            proofId: string;
-        };
         NativeApplicantSigningSession: {
             clientId: string;
             /** Format: date-time */
@@ -752,123 +719,6 @@ export interface operations {
                 };
             };
             /** @description Service unavailable */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-        };
-    };
-    CustomerApplications_MintResidentHandoff: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Resource identifier (UUID). */
-                applicationId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MintApplicantResidentProofRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MintApplicantResidentProofResponse"];
-                };
-            };
-            /** @description Bad request (validation/format errors) */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Unauthorized (missing/invalid credentials) */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Forbidden (insufficient permissions) */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Gone */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ProblemDetails"];
-                };
-            };
-            /** @description Unprocessable entity (domain validation) */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldValidationProblemDetails"];
-                };
-            };
-            /** @description Too Many Requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
-                };
-            };
-            /** @description Service Unavailable */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2102,7 +1952,10 @@ export interface operations {
     CustomerApplications_Submit: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Stable key for replaying the same task-request intent. */
+                "Idempotency-Key": string;
+            };
             path: {
                 /** @description Resource identifier (UUID). */
                 draftId: string;

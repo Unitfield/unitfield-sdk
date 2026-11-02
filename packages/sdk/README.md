@@ -70,8 +70,8 @@ fits as is). `/api/customer-auth/v1` is a first-party server API with no SDK cli
 `requests`, `renewals`, `notifications`, `extensionActions`, profile and notification
 preferences. `ApplicantClient` (`/api/customer/v1/applications`): `legal`, `list`,
 `createDraft`, `getDraft`, `deleteDraft`, `saveStep`, `saveHousehold`, `recordConsent`,
-upload sessions, `submit`, `status`, `screening`, `openSigningSession`,
-`residentHandoff`. The organization always comes from the token. Operations that
+upload sessions, `submit`, `status`, `screening`, `openSigningSession`. The
+organization always comes from the token. Operations that
 move money or create records require a caller-chosen `idempotencyKey`.
 
 ## Installed apps (server)

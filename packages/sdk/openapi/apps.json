@@ -28,7 +28,7 @@
         ],
         "summary": "Queue a reviewed rental availability action",
         "description": "App-only runtime operation. Provide the current installation's client-credentials token; 'X-Tenant-Id' is not required. The extension must declare rental.availability.check.v1. Only the exact reviewed request and input fields are accepted; duplicate fields, arbitrary input JSON and internal IDs are rejected. The idempotency key replays only the identical action, input and grant generation. The response is queued work, and its result is available only while that grant remains current.",
-        "operationId": "Connect_AppActions_Enqueue",
+        "operationId": "Apps_AppActions_Enqueue",
         "requestBody": {
           "content": {
             "application/json": {
@@ -172,7 +172,7 @@
         ],
         "summary": "Get an app action",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_AppActions_Get",
+        "operationId": "Apps_AppActions_Get",
         "parameters": [
           {
             "name": "workId",
@@ -308,7 +308,7 @@
         ],
         "summary": "Create lease Checkout Session for Payment Element",
         "description": "Creates a Checkout Session with ui_mode=elements for a lease payment. Initialize CheckoutElementsProvider with the returned clientSecret and stripeAccountId, then call checkout.confirm() to submit. Fulfillment remains provider-confirmed webhook and payment-status authority.",
-        "operationId": "Connect_Payments_CreateLeaseCheckoutSession",
+        "operationId": "Apps_Payments_CreateLeaseCheckoutSession",
         "parameters": [
           {
             "name": "leasePublicId",
@@ -477,7 +477,7 @@
         ],
         "summary": "List published listings",
         "description": "App runtime operation. The resolved app installation supplies tenant context; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_Listings_ListUnits",
+        "operationId": "Apps_Listings_ListUnits",
         "parameters": [
           {
             "name": "Beds",
@@ -724,7 +724,7 @@
         ],
         "summary": "Get one published listing",
         "description": "Looks the listing up by listingPublicId, the id returned in every list item's listingPublicId field. The unitPublicId is not accepted here.",
-        "operationId": "Connect_Listings_GetListing",
+        "operationId": "Apps_Listings_GetListing",
         "parameters": [
           {
             "name": "listingPublicId",
@@ -888,7 +888,7 @@
         ],
         "summary": "Get the organization context",
         "description": "App runtime operation. The resolved app installation supplies tenant context; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_Organization_Get",
+        "operationId": "Apps_Organization_Get",
         "responses": {
           "200": {
             "description": "OK",
@@ -1028,7 +1028,7 @@
         ],
         "summary": "Get online payment readiness",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_Payments_GetReadiness",
+        "operationId": "Apps_Payments_GetReadiness",
         "responses": {
           "200": {
             "description": "OK",
@@ -1172,7 +1172,7 @@
         ],
         "summary": "Get a payment",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_Payments_GetPayment",
+        "operationId": "Apps_Payments_GetPayment",
         "parameters": [
           {
             "name": "paymentPublicId",
@@ -1317,7 +1317,7 @@
         ],
         "summary": "Get a rental application draft",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_RentalApplications_GetDraft",
+        "operationId": "Apps_RentalApplications_GetDraft",
         "parameters": [
           {
             "name": "draftToken",
@@ -1453,7 +1453,7 @@
         ],
         "summary": "Upload a rental application attachment",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_RentalApplications_UploadAttachment",
+        "operationId": "Apps_RentalApplications_UploadAttachment",
         "parameters": [
           {
             "name": "draftToken",
@@ -1611,7 +1611,7 @@
         ],
         "summary": "Save a rental application step",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_RentalApplications_SaveStep",
+        "operationId": "Apps_RentalApplications_SaveStep",
         "parameters": [
           {
             "name": "draftToken",
@@ -1765,7 +1765,7 @@
         ],
         "summary": "Submit a rental application",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_RentalApplications_Submit",
+        "operationId": "Apps_RentalApplications_Submit",
         "parameters": [
           {
             "name": "draftToken",
@@ -1916,7 +1916,7 @@
         ],
         "summary": "Send a verification code to the applicant",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_RentalApplications_SendOtp",
+        "operationId": "Apps_RentalApplications_SendOtp",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2065,7 +2065,7 @@
         ],
         "summary": "Verify the applicant's code",
         "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
-        "operationId": "Connect_RentalApplications_VerifyOtp",
+        "operationId": "Apps_RentalApplications_VerifyOtp",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2210,7 +2210,7 @@
         ],
         "summary": "Create screening Checkout Session for Payment Element",
         "description": "Creates a Checkout Session with ui_mode=elements for the applicant's Payment Element. Initialize CheckoutElementsProvider with the returned clientSecret and stripeAccountId, then call checkout.confirm() to submit. Fulfillment remains provider-confirmed webhook and payment-status authority.",
-        "operationId": "Connect_Payments_CreateScreeningCheckoutSession",
+        "operationId": "Apps_Payments_CreateScreeningCheckoutSession",
         "parameters": [
           {
             "name": "applicationPublicId",

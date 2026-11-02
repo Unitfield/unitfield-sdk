@@ -1,6 +1,6 @@
 {
   "name": "@unitfield/sdk",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Typed JavaScript and TypeScript SDK for Unitfield: storefront, customer sign-in, resident and applicant APIs, installed apps and webhooks.",
   "license": "MIT",
   "type": "module",
