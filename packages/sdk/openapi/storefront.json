@@ -1,0 +1,2293 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Unitfield Platform API",
+    "description": "Core module entry points\n- Organizations: /api/v1/organizations\n- Accounting: /api/v1/accounting\n- Payments: /api/v1/payments",
+    "contact": {
+      "name": "Unitfield Support",
+      "url": "https://unitfield.com/support",
+      "email": "support@unitfield.com"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/api/storefront/v1/hosts/{host}": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Resolve Host",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_ResolveHost",
+        "parameters": [
+          {
+            "name": "host",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontHostResolution"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified"
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/inquiries": {
+      "post": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Create Inquiry",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_CreateInquiry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/StorefrontInquiryRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontInquiryAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/listings": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront List Listings",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_ListListings",
+        "parameters": [
+          {
+            "name": "bedroomsMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "bedroomsMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "bathroomsMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ],
+              "format": "double"
+            }
+          },
+          {
+            "name": "rentMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ],
+              "format": "double"
+            }
+          },
+          {
+            "name": "rentMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ],
+              "format": "double"
+            }
+          },
+          {
+            "name": "availableBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "propertyId",
+            "in": "query",
+            "description": "Resource identifier.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unitPublicKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontListingsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/listings/{listingPublicId}": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Get Listing",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_GetListing",
+        "parameters": [
+          {
+            "name": "listingPublicId",
+            "in": "path",
+            "description": "Resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicListingDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/pages/{slug}": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Get Page",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_GetPage",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/properties": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront List Properties",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_ListProperties",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPropertyPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/properties/{propertyPublicId}": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Get Property",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_GetProperty",
+        "parameters": [
+          {
+            "name": "propertyPublicId",
+            "in": "path",
+            "description": "Resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPropertyDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/site": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Get Site",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_GetSite",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSite"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified"
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "JsonElement": {},
+      "PublicListingCard": {
+        "required": [
+          "listingPublicId",
+          "unitPublicId",
+          "unitPublicKey",
+          "propertyPublicId",
+          "title",
+          "propertyName",
+          "unitName",
+          "bedrooms",
+          "bathrooms",
+          "areaSqft",
+          "rent",
+          "currency",
+          "rentPeriod",
+          "availableFrom",
+          "acceptsApplications",
+          "applyUrl",
+          "city",
+          "state",
+          "coverImageUrl",
+          "publishedAt",
+          "latitude",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "unitPublicId": {
+            "type": "string"
+          },
+          "unitPublicKey": {
+            "type": "string"
+          },
+          "propertyPublicId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "unitName": {
+            "type": "string"
+          },
+          "bedrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "areaSqft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "rent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "rentPeriod": {
+            "type": "string"
+          },
+          "availableFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "acceptsApplications": {
+            "type": "boolean"
+          },
+          "applyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "coverImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "PublicListingCardView": {
+        "required": [
+          "listingPublicId",
+          "unitPublicId",
+          "unitPublicKey",
+          "propertyPublicId",
+          "title",
+          "propertyName",
+          "unitName",
+          "bedrooms",
+          "bathrooms",
+          "areaSqft",
+          "rent",
+          "currency",
+          "rentPeriod",
+          "availableFrom",
+          "acceptsApplications",
+          "applyUrl",
+          "city",
+          "state",
+          "coverImageUrl",
+          "latitude",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "unitPublicId": {
+            "type": "string"
+          },
+          "unitPublicKey": {
+            "type": "string"
+          },
+          "propertyPublicId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "unitName": {
+            "type": "string"
+          },
+          "bedrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "areaSqft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "rent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "rentPeriod": {
+            "type": "string"
+          },
+          "availableFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "acceptsApplications": {
+            "type": "boolean"
+          },
+          "applyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "coverImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "PublicListingDetail": {
+        "required": [
+          "card",
+          "description",
+          "address1",
+          "postalCode",
+          "country",
+          "photos",
+          "amenities",
+          "virtualTourUrl",
+          "property"
+        ],
+        "type": "object",
+        "properties": {
+          "card": {
+            "$ref": "#/components/schemas/PublicListingCard"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address1": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "country": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicPhoto"
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "virtualTourUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "property": {
+            "$ref": "#/components/schemas/PublicPropertySummary"
+          }
+        }
+      },
+      "PublicPhoto": {
+        "required": [
+          "url",
+          "alt",
+          "isCover"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "alt": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isCover": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PublicPropertyCard": {
+        "required": [
+          "propertyPublicId",
+          "name",
+          "headline",
+          "city",
+          "state",
+          "coverImageUrl",
+          "listingCount",
+          "rentFrom",
+          "latitude",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyPublicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "headline": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "coverImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "listingCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "rentFrom": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "PublicPropertyDetail": {
+        "required": [
+          "property",
+          "listings"
+        ],
+        "type": "object",
+        "properties": {
+          "property": {
+            "$ref": "#/components/schemas/PublicPropertySummary"
+          },
+          "listings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicListingCard"
+            }
+          }
+        }
+      },
+      "PublicPropertyPage": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicPropertyCard"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicPropertySummary": {
+        "required": [
+          "propertyPublicId",
+          "name",
+          "headline",
+          "description",
+          "address1",
+          "city",
+          "state",
+          "postalCode",
+          "country",
+          "latitude",
+          "longitude",
+          "photos"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyPublicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "headline": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address1": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "country": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicPhoto"
+            }
+          }
+        }
+      },
+      "StorefrontBrand": {
+        "required": [
+          "name",
+          "slug",
+          "logoUrl",
+          "primaryColor",
+          "themeMode",
+          "brandHeaderBackground"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "primaryColor": {
+            "type": "string"
+          },
+          "themeMode": {
+            "type": "string"
+          },
+          "brandHeaderBackground": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StorefrontContact": {
+        "required": [
+          "email",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "StorefrontHostResolution": {
+        "required": [
+          "status",
+          "kind",
+          "host",
+          "role",
+          "siteId",
+          "organizationId",
+          "slug",
+          "publishableKey",
+          "primaryHost",
+          "redirectTo",
+          "revision",
+          "hosts"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "siteId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "organizationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "slug": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishableKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "primaryHost": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "redirectTo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "revision": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "hosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "storefrontClientId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "StorefrontHostedUrls": {
+        "required": [
+          "applyBaseUrl",
+          "signInUrl",
+          "accountUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "applyBaseUrl": {
+            "type": "string"
+          },
+          "signInUrl": {
+            "type": "string"
+          },
+          "accountUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "StorefrontInquiryAccepted": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "StorefrontInquiryRequest": {
+        "required": [
+          "kind",
+          "name",
+          "email",
+          "phone",
+          "message",
+          "listingPublicId",
+          "preferredTimes",
+          "turnstileToken"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "listingPublicId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "preferredTimes": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "turnstileToken": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "StorefrontListingsResponse": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicListingCardView"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "StorefrontPage": {
+        "required": [
+          "siteId",
+          "revision",
+          "page",
+          "isPreview"
+        ],
+        "type": "object",
+        "properties": {
+          "siteId": {
+            "type": "string"
+          },
+          "revision": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "page": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "isPreview": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StorefrontPageIndexEntry": {
+        "required": [
+          "id",
+          "kind",
+          "slug",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "StorefrontSite": {
+        "required": [
+          "siteId",
+          "status",
+          "revision",
+          "themeId",
+          "themeVersion",
+          "settings",
+          "navigation",
+          "pages",
+          "brand",
+          "contact",
+          "hostedUrls",
+          "primaryHost",
+          "isPreview"
+        ],
+        "type": "object",
+        "properties": {
+          "siteId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "revision": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "themeId": {
+            "type": "string"
+          },
+          "themeVersion": {
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "navigation": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StorefrontPageIndexEntry"
+            }
+          },
+          "brand": {
+            "$ref": "#/components/schemas/StorefrontBrand"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/StorefrontContact"
+          },
+          "hostedUrls": {
+            "$ref": "#/components/schemas/StorefrontHostedUrls"
+          },
+          "primaryHost": {
+            "type": "string"
+          },
+          "isPreview": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UnitfieldProblemDetails": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supportCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "UnitfieldValidationProblemDetails": {
+        "required": [
+          "errors",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supportCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter a Unitfield API access token issued by Unitfield Auth. ID tokens are not API tokens.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "description": "OAuth2 authentication with Unitfield Auth. Request the unitfield-api audience.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.unitfield.com/oauth2/auth",
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "openid": "OpenID Connect",
+              "profile": "User profile",
+              "email": "Email address",
+              "unitfield-api": "Unitfield Platform API"
+            }
+          }
+        }
+      },
+      "OAuth2User": {
+        "type": "oauth2",
+        "description": "OAuth2 authorization-code authentication for interactive Unitfield users. App installation management operations also require 'X-Tenant-Id' and tenant permissions.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.unitfield.com/oauth2/auth",
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "openid": "OpenID Connect",
+              "profile": "User profile",
+              "email": "Email address",
+              "unitfield-api": "Unitfield Platform API"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

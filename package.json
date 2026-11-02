@@ -1,0 +1,16 @@
+{
+  "name": "unitfield-sdk",
+  "private": true,
+  "description": "Unitfield's public JavaScript and TypeScript SDKs.",
+  "license": "MIT",
+  "packageManager": "pnpm@11.11.0",
+  "engines": {
+    "node": ">=24.14.0 <25"
+  },
+  "scripts": {
+    "gen:api": "pnpm --filter @unitfield/sdk gen:api",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build"
+  }
+}

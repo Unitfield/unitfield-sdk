@@ -1,0 +1,3671 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Unitfield Platform API",
+    "description": "Core module entry points\n- Organizations: /api/v1/organizations\n- Accounting: /api/v1/accounting\n- Payments: /api/v1/payments",
+    "contact": {
+      "name": "Unitfield Support",
+      "url": "https://unitfield.com/support",
+      "email": "support@unitfield.com"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/api/customer/v1/applications": {
+      "get": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "The account's open drafts and submitted applications",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_List",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts": {
+      "post": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Start an application for a unit, or resume the account's open draft for it",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_CreateDraft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomerApplicationDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationDraftResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}": {
+      "get": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "A draft with its steps, attachments, consent and form questions",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_GetDraft",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationDraftResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      },
+      "delete": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Withdraw an open draft",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_DeleteDraft",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationDeleteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}/attachments/complete": {
+      "post": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Complete a draft attachment upload",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_CompleteAttachmentUpload",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicCompleteDraftAttachmentUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicDraftAttachmentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}/attachments/upload-session": {
+      "post": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Create a direct upload session for a draft attachment",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_CreateAttachmentUploadSession",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicCreateDraftAttachmentUploadSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicDraftAttachmentUploadSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}/consent": {
+      "put": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Record the applicant privacy acknowledgment and electronic records consent",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_RecordConsent",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerApplicationConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationConsentState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}/household": {
+      "put": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Save the household step (occupants, pets, vehicles) of a draft",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_SaveHousehold",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerApplicationSaveStepRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicDraftStepSaveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}/steps/{stepKey}": {
+      "put": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Save one step of a draft",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_SaveStep",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "stepKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerApplicationSaveStepRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicDraftStepSaveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/drafts/{draftId}/submit": {
+      "post": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Submit the application (Idempotency-Key header required)",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_Submit",
+        "parameters": [
+          {
+            "name": "draftId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicSubmitApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicSubmitApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/legal": {
+      "get": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "The currently published applicant legal documents and certification",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_GetLegal",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicRentalApplicationLegalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/{applicationId}/resident-handoff": {
+      "post": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Mint the one-time proof that continues the applicant into Unitfield Resident",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_MintResidentHandoff",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MintApplicantResidentProofRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MintApplicantResidentProofResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/{applicationId}/screening": {
+      "get": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "The screening handoff: where to continue with the screening provider and what it costs the applicant",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_GetScreening",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationScreeningResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/{applicationId}/signing-session": {
+      "post": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Open the embedded signing session for the applicant's agreement",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_OpenSigningSession",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NativeApplicantSigningSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/applications/{applicationId}/status": {
+      "get": {
+        "tags": [
+          "customer-applications"
+        ],
+        "summary": "Status, agreement, signing and resident continuation of a submitted application",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerApplications_GetStatus",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerApplicationStatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/resident-legal": {
+      "get": {
+        "tags": [
+          "customer-resident-legal"
+        ],
+        "summary": "Whether the account still has to accept the resident portal documents",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerResidentLegal_GetStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResidentPortalLegalStatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/customer/v1/resident-legal/acceptance": {
+      "post": {
+        "tags": [
+          "customer-resident-legal"
+        ],
+        "summary": "Record acceptance of the current resident portal documents",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "CustomerResidentLegal_Accept",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResidentPortalLegalAcceptanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResidentPortalLegalAcceptanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplicantAgreementState": {
+        "enum": [
+          "NotReady",
+          "Preparing",
+          "AwaitingSignatures",
+          "Executed",
+          "Unavailable"
+        ]
+      },
+      "ApplicantContinuation": {
+        "required": [
+          "organizationId",
+          "businessName",
+          "spaceName",
+          "agreementState",
+          "signingDelivery",
+          "residentState",
+          "nextAction"
+        ],
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessName": {
+            "type": "string"
+          },
+          "spaceName": {
+            "type": "string"
+          },
+          "agreementState": {
+            "$ref": "#/components/schemas/ApplicantAgreementState"
+          },
+          "signingDelivery": {
+            "$ref": "#/components/schemas/ApplicantSigningDelivery"
+          },
+          "residentState": {
+            "$ref": "#/components/schemas/ApplicantResidentState"
+          },
+          "nextAction": {
+            "$ref": "#/components/schemas/ApplicantNextAction"
+          }
+        }
+      },
+      "ApplicantNextAction": {
+        "enum": [
+          "Wait",
+          "CheckSigningEmail",
+          "SignAgreement",
+          "OpenResident",
+          "OpenAccount"
+        ]
+      },
+      "ApplicantResidentState": {
+        "enum": [
+          "NotReady",
+          "InvitationReady",
+          "Unavailable",
+          "Linked"
+        ]
+      },
+      "ApplicantSigningDelivery": {
+        "enum": [
+          "Email",
+          "Embedded",
+          "Unavailable"
+        ]
+      },
+      "CreateCustomerApplicationDraftRequest": {
+        "required": [
+          "unitPublicKey"
+        ],
+        "type": "object",
+        "properties": {
+          "unitPublicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerApplicationConsentRequest": {
+        "required": [
+          "acknowledgedApplicantPrivacy",
+          "consentedToElectronicRecords",
+          "applicantPrivacyDocumentId",
+          "applicantPrivacyVersion",
+          "applicantPrivacyContentSha256",
+          "electronicRecordsDocumentId",
+          "electronicRecordsVersion",
+          "electronicRecordsContentSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "acknowledgedApplicantPrivacy": {
+            "type": "boolean"
+          },
+          "consentedToElectronicRecords": {
+            "type": "boolean"
+          },
+          "applicantPrivacyDocumentId": {
+            "type": "string"
+          },
+          "applicantPrivacyVersion": {
+            "type": "string"
+          },
+          "applicantPrivacyContentSha256": {
+            "type": "string"
+          },
+          "electronicRecordsDocumentId": {
+            "type": "string"
+          },
+          "electronicRecordsVersion": {
+            "type": "string"
+          },
+          "electronicRecordsContentSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerApplicationConsentState": {
+        "required": [
+          "accepted",
+          "acceptedAtUtc",
+          "applicantPrivacyDocumentId",
+          "applicantPrivacyVersion",
+          "applicantPrivacyContentSha256",
+          "electronicRecordsDocumentId",
+          "electronicRecordsVersion",
+          "electronicRecordsContentSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "acceptedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "applicantPrivacyDocumentId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "applicantPrivacyVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "applicantPrivacyContentSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "electronicRecordsDocumentId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "electronicRecordsVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "electronicRecordsContentSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CustomerApplicationDeleteResponse": {
+        "required": [
+          "deleted"
+        ],
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CustomerApplicationDraftResponse": {
+        "required": [
+          "draftId",
+          "propertyId",
+          "unitId",
+          "propertyName",
+          "unitName",
+          "email",
+          "currentStep",
+          "progressPercent",
+          "status",
+          "expiresAtUtc",
+          "isResumed",
+          "consent",
+          "steps",
+          "attachments",
+          "templateQuestions"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "unitName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "currentStep": {
+            "type": "string"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RentalApplicationDraftStatus"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isResumed": {
+            "type": "boolean"
+          },
+          "consent": {
+            "$ref": "#/components/schemas/CustomerApplicationConsentState"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicDraftStepPayloadResponse"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicDraftAttachmentResponse"
+            }
+          },
+          "templateQuestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyFormTemplateQuestionDto"
+            }
+          }
+        }
+      },
+      "CustomerApplicationListItem": {
+        "required": [
+          "kind",
+          "id",
+          "propertyId",
+          "unitId",
+          "propertyName",
+          "unitName",
+          "state",
+          "progressPercent",
+          "updatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "unitName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": "string"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CustomerApplicationListResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerApplicationListItem"
+            }
+          }
+        }
+      },
+      "CustomerApplicationSaveStepRequest": {
+        "required": [
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        }
+      },
+      "CustomerApplicationScreeningResponse": {
+        "required": [
+          "screening"
+        ],
+        "type": "object",
+        "properties": {
+          "screening": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PublicScreeningDto"
+              }
+            ]
+          }
+        }
+      },
+      "CustomerApplicationStatusResponse": {
+        "required": [
+          "applicationId",
+          "stage",
+          "screeningStatus",
+          "progressPercent",
+          "submittedAtUtc",
+          "updatedAtUtc",
+          "hasLease",
+          "continuation",
+          "screening",
+          "propertyName",
+          "unitName",
+          "expectedMoveInDate",
+          "coverImageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/RentalApplicationStage"
+          },
+          "screeningStatus": {
+            "$ref": "#/components/schemas/RentalApplicationScreeningStatus"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "submittedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hasLease": {
+            "type": "boolean"
+          },
+          "continuation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ApplicantContinuation"
+              }
+            ]
+          },
+          "screening": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PublicScreeningDto"
+              }
+            ]
+          },
+          "propertyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "unitName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expectedMoveInDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "coverImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "JsonElement": {},
+      "MintApplicantResidentProofRequest": {
+        "required": [
+          "recipientChallengeSha256",
+          "issuanceKey",
+          "intentExpiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "recipientChallengeSha256": {
+            "type": "string"
+          },
+          "issuanceKey": {
+            "type": "string"
+          },
+          "intentExpiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receiptOnly": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "MintApplicantResidentProofResponse": {
+        "required": [
+          "proofId",
+          "expiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "proofId": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NativeApplicantSigningSession": {
+        "required": [
+          "clientId",
+          "signUrl",
+          "expiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "signUrl": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PropertyFormTemplateQuestionDto": {
+        "required": [
+          "id",
+          "label",
+          "type",
+          "required",
+          "options",
+          "orderIndex",
+          "active"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RentalApplicationQuestionType"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "orderIndex": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PublicCompleteDraftAttachmentUploadRequest": {
+        "required": [
+          "attachmentType",
+          "sessionId",
+          "actualSize"
+        ],
+        "type": "object",
+        "properties": {
+          "attachmentType": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actualSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "checksumSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicCreateDraftAttachmentUploadSessionRequest": {
+        "required": [
+          "attachmentType",
+          "fileName",
+          "contentType",
+          "byteSizeMax"
+        ],
+        "type": "object",
+        "properties": {
+          "attachmentType": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "byteSizeMax": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "checksumSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicDraftAttachmentResponse": {
+        "required": [
+          "attachmentId",
+          "fileId",
+          "fileName",
+          "attachmentType",
+          "uploadedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "attachmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "attachmentType": {
+            "type": "string"
+          },
+          "uploadedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublicDraftAttachmentUploadSessionResponse": {
+        "required": [
+          "sessionId",
+          "url",
+          "method",
+          "headers",
+          "expiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublicDraftStepPayloadResponse": {
+        "required": [
+          "stepKey",
+          "payloadJson",
+          "isComplete",
+          "updatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "stepKey": {
+            "type": "string"
+          },
+          "payloadJson": {
+            "type": "string"
+          },
+          "isComplete": {
+            "type": "boolean"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublicDraftStepSaveResponse": {
+        "required": [
+          "stepKey",
+          "isComplete",
+          "progressPercent",
+          "currentStep",
+          "errors"
+        ],
+        "type": "object",
+        "properties": {
+          "stepKey": {
+            "type": "string"
+          },
+          "isComplete": {
+            "type": "boolean"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "currentStep": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalApplicationValidationError"
+            }
+          }
+        }
+      },
+      "PublicRentalApplicationLegalResponse": {
+        "required": [
+          "legalReady",
+          "unavailableReason",
+          "documents",
+          "certification"
+        ],
+        "type": "object",
+        "properties": {
+          "legalReady": {
+            "type": "boolean"
+          },
+          "unavailableReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalApplicationLegalDocument"
+            }
+          },
+          "certification": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RentalApplicationLegalCertification"
+              }
+            ]
+          }
+        }
+      },
+      "PublicScreeningDto": {
+        "required": [
+          "state",
+          "payer",
+          "feeCents",
+          "applicantProgress",
+          "providerName",
+          "applicationUrl",
+          "isTest"
+        ],
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string"
+          },
+          "payer": {
+            "type": "string"
+          },
+          "feeCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "applicantProgress": {
+            "type": "string"
+          },
+          "providerName": {
+            "type": "string"
+          },
+          "applicationUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isTest": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PublicSubmitApplicationRequest": {
+        "required": [
+          "certifiedApplication",
+          "typedSignature",
+          "rentalApplicationTermsDocumentId",
+          "rentalApplicationTermsVersion",
+          "rentalApplicationTermsContentSha256",
+          "certificationTextSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "certifiedApplication": {
+            "type": "boolean"
+          },
+          "typedSignature": {
+            "type": "string"
+          },
+          "rentalApplicationTermsDocumentId": {
+            "type": "string"
+          },
+          "rentalApplicationTermsVersion": {
+            "type": "string"
+          },
+          "rentalApplicationTermsContentSha256": {
+            "type": "string"
+          },
+          "certificationTextSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "PublicSubmitApplicationResponse": {
+        "required": [
+          "applicationId",
+          "stage",
+          "screeningStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/RentalApplicationStage"
+          },
+          "screeningStatus": {
+            "$ref": "#/components/schemas/RentalApplicationScreeningStatus"
+          }
+        }
+      },
+      "RentalApplicationDraftStatus": {
+        "enum": [
+          "InProgress",
+          "Submitted",
+          "Deleted",
+          "Expired"
+        ]
+      },
+      "RentalApplicationLegalCertification": {
+        "required": [
+          "text",
+          "textSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "textSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalApplicationLegalDocument": {
+        "required": [
+          "id",
+          "version",
+          "contentSha256",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "contentSha256": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "RentalApplicationQuestionType": {
+        "enum": [
+          "ShortText",
+          "LongText",
+          "SingleSelect",
+          "MultiSelect",
+          "Date",
+          "Number",
+          "YesNo"
+        ]
+      },
+      "RentalApplicationScreeningStatus": {
+        "enum": [
+          "NotRequired",
+          "PaymentPending",
+          "Queued",
+          "Completed",
+          "Failed"
+        ]
+      },
+      "RentalApplicationStage": {
+        "enum": [
+          "ApplicationSent",
+          "InProgress",
+          "IdentityVerification",
+          "Decision",
+          "Approved",
+          "Declined",
+          "Deleted"
+        ]
+      },
+      "RentalApplicationValidationError": {
+        "required": [
+          "field",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ResidentPortalLegalAcceptanceRequest": {
+        "required": [
+          "acceptedPortalTerms",
+          "acknowledgedResidentPrivacy",
+          "consentedToElectronicRecords",
+          "portalTermsDocumentId",
+          "portalTermsVersion",
+          "portalTermsContentSha256",
+          "residentPrivacyDocumentId",
+          "residentPrivacyVersion",
+          "residentPrivacyContentSha256",
+          "electronicRecordsDocumentId",
+          "electronicRecordsVersion",
+          "electronicRecordsContentSha256",
+          "manifestSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "acceptedPortalTerms": {
+            "type": "boolean"
+          },
+          "acknowledgedResidentPrivacy": {
+            "type": "boolean"
+          },
+          "consentedToElectronicRecords": {
+            "type": "boolean"
+          },
+          "portalTermsDocumentId": {
+            "type": "string"
+          },
+          "portalTermsVersion": {
+            "type": "string"
+          },
+          "portalTermsContentSha256": {
+            "type": "string"
+          },
+          "residentPrivacyDocumentId": {
+            "type": "string"
+          },
+          "residentPrivacyVersion": {
+            "type": "string"
+          },
+          "residentPrivacyContentSha256": {
+            "type": "string"
+          },
+          "electronicRecordsDocumentId": {
+            "type": "string"
+          },
+          "electronicRecordsVersion": {
+            "type": "string"
+          },
+          "electronicRecordsContentSha256": {
+            "type": "string"
+          },
+          "manifestSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "ResidentPortalLegalAcceptanceResponse": {
+        "required": [
+          "recorded"
+        ],
+        "type": "object",
+        "properties": {
+          "recorded": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "ResidentPortalLegalDocumentDto": {
+        "required": [
+          "id",
+          "version",
+          "contentSha256",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "contentSha256": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ResidentPortalLegalStatusResponse": {
+        "required": [
+          "evidenceMissing",
+          "missingInvites",
+          "packageId",
+          "manifestSha256",
+          "locale",
+          "documents",
+          "unavailableReason"
+        ],
+        "type": "object",
+        "properties": {
+          "evidenceMissing": {
+            "type": "boolean"
+          },
+          "missingInvites": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "packageId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "manifestSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "locale": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResidentPortalLegalDocumentDto"
+            }
+          },
+          "unavailableReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UnitfieldProblemDetails": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supportCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "UnitfieldValidationProblemDetails": {
+        "required": [
+          "errors",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supportCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter a Unitfield API access token issued by Unitfield Auth. ID tokens are not API tokens.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "description": "OAuth2 authentication with Unitfield Auth. Request the unitfield-api audience.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.unitfield.com/oauth2/auth",
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "openid": "OpenID Connect",
+              "profile": "User profile",
+              "email": "Email address",
+              "unitfield-api": "Unitfield Platform API"
+            }
+          }
+        }
+      },
+      "OAuth2User": {
+        "type": "oauth2",
+        "description": "OAuth2 authorization-code authentication for interactive Unitfield users. App installation management operations also require 'X-Tenant-Id' and tenant permissions.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.unitfield.com/oauth2/auth",
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "openid": "OpenID Connect",
+              "profile": "User profile",
+              "email": "Email address",
+              "unitfield-api": "Unitfield Platform API"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+name: Release SDK
+
+# Publishes @unitfield/sdk when a push to main carries a version npm does not have yet. Bump `version` in
+# packages/sdk/package.json and merge; nothing else is needed. npm trusts this workflow file through trusted publishing
+# (GitHub OIDC), so there is no npm token anywhere, and every release carries provenance.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - packages/sdk/**
+      - pnpm-lock.yaml
+      - .github/workflows/release-sdk.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-sdk
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish @unitfield/sdk
+    # npm trusted publishing accepts OIDC tokens from GitHub-hosted runners only.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+
+      - name: Use an npm that supports trusted publishing
+        run: npm install --global npm@11.16.0
+
+      - name: Find out whether this version is new
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          name=$(node -p "require('./packages/sdk/package.json').name")
+          version=$(node -p "require('./packages/sdk/package.json').version")
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "$name@$version is already on npm; nothing to publish."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "$name@$version is new; it will be tested and published."
+          fi
+
+      - name: Activate pinned pnpm
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.11.0 --activate
+
+      - name: Install from the lockfile
+        if: steps.version.outputs.publish == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Test (contract check, build, packed consumer)
+        if: steps.version.outputs.publish == 'true'
+        run: pnpm test
+
+      - name: Publish with provenance
+        if: steps.version.outputs.publish == 'true'
+        working-directory: packages/sdk
+        run: npm publish --access public --provenance
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "### ${{ steps.version.outputs.name }}@${{ steps.version.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "publish: ${{ steps.version.outputs.publish }}" >> "$GITHUB_STEP_SUMMARY"

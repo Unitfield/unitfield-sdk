@@ -1,0 +1,62 @@
+{
+  "name": "@unitfield/sdk",
+  "version": "0.1.2",
+  "description": "Typed JavaScript and TypeScript SDK for Unitfield: storefront, customer sign-in, resident and applicant APIs, installed apps and webhooks.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "gen:api": "node scripts/openapi.mjs all",
+    "gen:api:check": "node scripts/openapi.mjs check",
+    "build": "tsc -p tsconfig.json",
+    "pretypecheck": "pnpm build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pretest": "pnpm gen:api:check && pnpm build",
+    "test": "node --experimental-strip-types --test --test-concurrency=1 test/*.test.mts",
+    "prepack": "pnpm build"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unitfield/unitfield-sdk.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/Unitfield/unitfield-sdk/issues"
+  },
+  "homepage": "https://developers.unitfield.com/docs/sdk/javascript-typescript",
+  "keywords": [
+    "unitfield",
+    "property-management",
+    "rental",
+    "storefront",
+    "oauth",
+    "pkce",
+    "webhooks",
+    "sdk"
+  ],
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "^5"
+  }
+}

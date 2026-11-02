@@ -1,0 +1,3824 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Unitfield Apps API",
+    "description": "Unitfield installed-app runtime API for websites, apps, and integrations.",
+    "contact": {
+      "name": "Unitfield Support",
+      "url": "https://unitfield.com/support",
+      "email": "support@unitfield.com"
+    },
+    "version": "apps-v1"
+  },
+  "servers": [
+    {
+      "url": "https://api.unitfield.com",
+      "description": "Production"
+    },
+    {
+      "url": "https://api-sandbox.unitfield.com",
+      "description": "Sandbox"
+    }
+  ],
+  "paths": {
+    "/api/apps/v1/app-actions": {
+      "post": {
+        "tags": [
+          "Apps Actions"
+        ],
+        "summary": "Queue a reviewed rental availability action",
+        "description": "App-only runtime operation. Provide the current installation's client-credentials token; 'X-Tenant-Id' is not required. The extension must declare rental.availability.check.v1. Only the exact reviewed request and input fields are accepted; duplicate fields, arbitrary input JSON and internal IDs are rejected. The idempotency key replays only the identical action, input and grant generation. The response is queued work, and its result is available only while that grant remains current.",
+        "operationId": "Connect_AppActions_Enqueue",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformAppActionSubmitDto"
+              },
+              "example": {
+                "extensionKey": "check-availability",
+                "resourcePublicId": "corg_ezpy6xylph5httbffcatfckb",
+                "input": {
+                  "listingPublicId": "clst_zuso3no1xmzyvubenkc-uvy_",
+                  "startDate": "2026-11-01",
+                  "endDate": "2027-10-31"
+                },
+                "idempotencyKey": "availability-check-001"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformAppActionWorkDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "availability:read",
+          "listings:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "listings"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/app-actions/{workId}": {
+      "get": {
+        "tags": [
+          "Apps Actions"
+        ],
+        "summary": "Get an app action",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_AppActions_Get",
+        "parameters": [
+          {
+            "name": "workId",
+            "in": "path",
+            "description": "Resource identifier (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformAppActionWorkDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "availability:read",
+          "listings:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "listings"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/leases/{leasePublicId}/payments/checkout-session": {
+      "post": {
+        "tags": [
+          "Apps Payments"
+        ],
+        "summary": "Create lease Checkout Session for Payment Element",
+        "description": "Creates a Checkout Session with ui_mode=elements for a lease payment. Initialize CheckoutElementsProvider with the returned clientSecret and stripeAccountId, then call checkout.confirm() to submit. Fulfillment remains provider-confirmed webhook and payment-status authority.",
+        "operationId": "Connect_Payments_CreateLeaseCheckoutSession",
+        "parameters": [
+          {
+            "name": "leasePublicId",
+            "in": "path",
+            "description": "Resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppCreateLeaseCheckoutSessionDto"
+              },
+              "example": {
+                "amountCents": 12500,
+                "method": "card",
+                "returnUrl": "https://leasing.example.com/pay/return"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppLeaseCheckoutSessionDto"
+                },
+                "example": {
+                  "paymentPublicId": "cpay_u85rashq9yr0oxrg_pbfbhpy",
+                  "purpose": "lease_payment",
+                  "leasePublicId": "clea_ucmuorofmskuihvyo9dqnl4h",
+                  "amountCents": 12500,
+                  "currency": "usd",
+                  "status": "pending",
+                  "checkoutSessionId": "cs_test_123",
+                  "clientSecret": "cs_test_123_secret_456",
+                  "stripeAccountId": "acct_connect_example"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "payments:create"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core",
+          "online_payments"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/listings/units": {
+      "get": {
+        "tags": [
+          "Apps Listings"
+        ],
+        "summary": "List published listings",
+        "description": "App runtime operation. The resolved app installation supplies tenant context; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_Listings_ListUnits",
+        "parameters": [
+          {
+            "name": "Beds",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Baths",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ],
+              "format": "double"
+            }
+          },
+          {
+            "name": "RentMin",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ],
+              "format": "double"
+            }
+          },
+          {
+            "name": "RentMax",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ],
+              "format": "double"
+            }
+          },
+          {
+            "name": "AvailableFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "Sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedListingPageDto"
+                },
+                "example": {
+                  "page": 1,
+                  "pageSize": 20,
+                  "total": 1,
+                  "items": [
+                    {
+                      "listingPublicId": "clst_zuso3no1xmzyvubenkc-uvy_",
+                      "unitPublicId": "cunit_fdj7wbj3fdnilwv3gxwwiw3l",
+                      "propertyPublicId": "cprop_ikjd_hues4tltlrehwa9h-gv",
+                      "propertyName": "Oak Street Apartments",
+                      "unitName": "Unit 4B",
+                      "bedrooms": 2,
+                      "bathrooms": 1.5,
+                      "areaSqft": 980,
+                      "rent": 2450,
+                      "currency": "USD",
+                      "availableFrom": "2026-06-01",
+                      "applyEligible": true,
+                      "city": "Austin",
+                      "state": "TX",
+                      "coverImageUrl": "https://cdn.unitfield.com/listings/sample-1.jpg",
+                      "applicationUrl": "https://leasing.example.com/apply/clst_zuso3no1xmzyvubenkc-uvy_",
+                      "publishedAt": "2026-05-20T10:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "listings:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "listings"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/listings/units/{listingPublicId}": {
+      "get": {
+        "tags": [
+          "Apps Listings"
+        ],
+        "summary": "Get one published listing",
+        "description": "Looks the listing up by listingPublicId, the id returned in every list item's listingPublicId field. The unitPublicId is not accepted here.",
+        "operationId": "Connect_Listings_GetListing",
+        "parameters": [
+          {
+            "name": "listingPublicId",
+            "in": "path",
+            "description": "Resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedListingDetailDto"
+                },
+                "example": {
+                  "listingPublicId": "clst_zuso3no1xmzyvubenkc-uvy_",
+                  "unitPublicId": "cunit_fdj7wbj3fdnilwv3gxwwiw3l",
+                  "propertyPublicId": "cprop_ikjd_hues4tltlrehwa9h-gv",
+                  "propertyName": "Oak Street Apartments",
+                  "unitName": "Unit 4B",
+                  "bedrooms": 2,
+                  "bathrooms": 1.5,
+                  "areaSqft": 980,
+                  "rent": 2450,
+                  "currency": "USD",
+                  "availableFrom": "2026-06-01",
+                  "applyEligible": true,
+                  "description": "Bright apartment with updated kitchen and in-unit laundry.",
+                  "city": "Austin",
+                  "state": "TX",
+                  "postalCode": "78701",
+                  "country": "US",
+                  "photoUrls": [
+                    "https://cdn.unitfield.com/listings/sample-1.jpg"
+                  ],
+                  "amenities": [
+                    "In-unit laundry",
+                    "Parking",
+                    "Pet friendly"
+                  ],
+                  "applicationUrl": "https://leasing.example.com/apply/clst_zuso3no1xmzyvubenkc-uvy_",
+                  "virtualTourUrl": null,
+                  "publishedAt": "2026-05-20T10:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "listings:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "listings"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/organization": {
+      "get": {
+        "tags": [
+          "Apps Organization"
+        ],
+        "summary": "Get the organization context",
+        "description": "App runtime operation. The resolved app installation supplies tenant context; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_Organization_Get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppOrganizationContextDto"
+                },
+                "example": {
+                  "id": "corg_ezpy6xylph5httbffcatfckb",
+                  "name": "Acme Property Group",
+                  "slug": "acme-property-group",
+                  "branding": {
+                    "logoUrl": "https://cdn.unitfield.com/orgs/acme/logo.png",
+                    "primaryColor": "#1F6FEB"
+                  },
+                  "contact": {
+                    "phone": "+1 555 0100",
+                    "email": "leasing@acme.test"
+                  },
+                  "policies": {
+                    "applicationsEnabled": true,
+                    "applicationFeeEnabled": true,
+                    "onlinePaymentsEnabled": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "listings:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/payments/readiness": {
+      "get": {
+        "tags": [
+          "Apps Payments"
+        ],
+        "summary": "Get online payment readiness",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_Payments_GetReadiness",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppPaymentReadinessDto"
+                },
+                "example": {
+                  "onlinePaymentsEnabled": true,
+                  "merchantStatus": "active",
+                  "chargesEnabled": true,
+                  "payoutsEnabled": true,
+                  "requirementsDue": [],
+                  "canCreateCheckoutSession": true,
+                  "unavailableReason": null,
+                  "bankAccounts": [
+                    {
+                      "displayName": "Operating Account",
+                      "type": "bank_account",
+                      "isDefaultIncoming": true,
+                      "supportsIncomingPayments": true,
+                      "isEnabled": true,
+                      "last4": "4242",
+                      "provisioningState": "ready",
+                      "verificationState": "verified"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "payments:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "online_payments"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/payments/{paymentPublicId}": {
+      "get": {
+        "tags": [
+          "Apps Payments"
+        ],
+        "summary": "Get a payment",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_Payments_GetPayment",
+        "parameters": [
+          {
+            "name": "paymentPublicId",
+            "in": "path",
+            "description": "Resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppPaymentStatusDto"
+                },
+                "example": {
+                  "paymentPublicId": "cpay_w9zv4wx7ra3umh0g_vktz06w",
+                  "purpose": "rental_application_screening_fee",
+                  "amountCents": 4500,
+                  "currency": "usd",
+                  "status": "processing",
+                  "applicationPublicId": "capp_nekn2an3dkhe4i-dnpoggth3",
+                  "screeningStatus": "PaymentPending",
+                  "createdAtUtc": "2026-05-20T10:12:00Z",
+                  "processedAtUtc": "2026-05-20T10:13:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "payments:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "online_payments"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/drafts/{draftToken}": {
+      "get": {
+        "tags": [
+          "Apps Rental Applications"
+        ],
+        "summary": "Get a rental application draft",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_RentalApplications_GetDraft",
+        "parameters": [
+          {
+            "name": "draftToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppDraftSnapshotDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone"
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "applications:read"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/drafts/{draftToken}/attachments": {
+      "post": {
+        "tags": [
+          "Apps Rental Applications"
+        ],
+        "summary": "Upload a rental application attachment",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_RentalApplications_UploadAttachment",
+        "parameters": [
+          {
+            "name": "draftToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppUploadDraftAttachmentDto"
+              },
+              "example": {
+                "attachmentType": "employment_letter",
+                "fileName": "paystub.pdf",
+                "contentType": "application/pdf",
+                "contentBase64": "JVBERi0xLjQK..."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppDraftAttachmentSummaryDto"
+                },
+                "example": {
+                  "fileName": "paystub.pdf",
+                  "attachmentType": "EmploymentLetter",
+                  "uploadedAtUtc": "2026-05-20T10:12:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone"
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "applications:write",
+          "files:write"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/drafts/{draftToken}/steps/{stepKey}": {
+      "put": {
+        "tags": [
+          "Apps Rental Applications"
+        ],
+        "summary": "Save a rental application step",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_RentalApplications_SaveStep",
+        "parameters": [
+          {
+            "name": "draftToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "stepKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppSaveApplicationStepDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppDraftStepSaveResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone"
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "applications:write"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/drafts/{draftToken}/submit": {
+      "post": {
+        "tags": [
+          "Apps Rental Applications"
+        ],
+        "summary": "Submit a rental application",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_RentalApplications_Submit",
+        "parameters": [
+          {
+            "name": "draftToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppSubmitApplicationDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSubmitApplicationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "applications:write"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/otp/send": {
+      "post": {
+        "tags": [
+          "Apps Rental Applications"
+        ],
+        "summary": "Send a verification code to the applicant",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_RentalApplications_SendOtp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppSendApplicationOtpDto"
+              },
+              "example": {
+                "listingPublicId": "clst_zuso3no1xmzyvubenkc-uvy_",
+                "email": "applicant@example.com",
+                "acknowledgedApplicantPrivacy": true,
+                "consentedToElectronicRecords": true,
+                "applicantPrivacyDocumentId": "applicant-privacy",
+                "applicantPrivacyVersion": "2026-05-01",
+                "applicantPrivacyContentSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "electronicRecordsDocumentId": "electronic-records",
+                "electronicRecordsVersion": "2026-05-01",
+                "electronicRecordsContentSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSendApplicationOtpResponseDto"
+                },
+                "example": {
+                  "otpSent": true,
+                  "expiresAtUtc": "2026-05-20T13:30:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "applications:write"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/otp/verify": {
+      "post": {
+        "tags": [
+          "Apps Rental Applications"
+        ],
+        "summary": "Verify the applicant's code",
+        "description": "App-only runtime operation. Provide a client-credentials token for the resolved app installation; 'X-Tenant-Id' is not required.",
+        "operationId": "Connect_RentalApplications_VerifyOtp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppVerifyApplicationOtpDto"
+              },
+              "example": {
+                "listingPublicId": "clst_zuso3no1xmzyvubenkc-uvy_",
+                "email": "applicant@example.com",
+                "code": "123456"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppVerifyApplicationOtpResponseDto"
+                },
+                "example": {
+                  "draftToken": "cdraft_example_draft",
+                  "currentStep": "move_in",
+                  "progressPercent": 0,
+                  "isResumed": false,
+                  "expiresAtUtc": "2026-05-20T14:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "applications:write"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/apps/v1/rental-applications/{applicationPublicId}/screening/checkout-session": {
+      "post": {
+        "tags": [
+          "Apps Payments"
+        ],
+        "summary": "Create screening Checkout Session for Payment Element",
+        "description": "Creates a Checkout Session with ui_mode=elements for the applicant's Payment Element. Initialize CheckoutElementsProvider with the returned clientSecret and stripeAccountId, then call checkout.confirm() to submit. Fulfillment remains provider-confirmed webhook and payment-status authority.",
+        "operationId": "Connect_Payments_CreateScreeningCheckoutSession",
+        "parameters": [
+          {
+            "name": "applicationPublicId",
+            "in": "path",
+            "description": "Resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppCreateScreeningCheckoutSessionDto"
+              },
+              "example": {
+                "method": "card",
+                "returnUrl": "https://leasing.example.com/apply/screening/return"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppScreeningCheckoutSessionDto"
+                },
+                "example": {
+                  "paymentPublicId": "cpay_w9zv4wx7ra3umh0g_vktz06w",
+                  "purpose": "rental_application_screening_fee",
+                  "applicationPublicId": "capp_nekn2an3dkhe4i-dnpoggth3",
+                  "amountCents": 4500,
+                  "currency": "usd",
+                  "status": "pending",
+                  "checkoutSessionId": "cs_test_screening_123",
+                  "clientSecret": "cs_test_screening_123_secret_456",
+                  "stripeAccountId": "acct_connect_example"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "x-unitfield-authenticated": true,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-scopes": [
+          "payments:create"
+        ],
+        "x-unitfield-required-features": [
+          "apps_api",
+          "leasing_core",
+          "online_payments",
+          "screening"
+        ],
+        "x-unitfield-tenant-header-required": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppBrandingDto": {
+        "required": [
+          "logoUrl",
+          "primaryColor"
+        ],
+        "type": "object",
+        "properties": {
+          "logoUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "primaryColor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AppContactDto": {
+        "required": [
+          "phone",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AppCreateLeaseCheckoutSessionDto": {
+        "required": [
+          "amountCents",
+          "returnUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "returnUrl": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "default": "card"
+          }
+        }
+      },
+      "AppCreateScreeningCheckoutSessionDto": {
+        "required": [
+          "returnUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "returnUrl": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "default": "card"
+          }
+        }
+      },
+      "AppDraftAttachmentSummaryDto": {
+        "required": [
+          "fileName",
+          "attachmentType",
+          "uploadedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "attachmentType": {
+            "type": "string"
+          },
+          "uploadedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AppDraftSnapshotDto": {
+        "required": [
+          "draftToken",
+          "email",
+          "currentStep",
+          "progressPercent",
+          "status",
+          "expiresAtUtc",
+          "steps",
+          "attachments"
+        ],
+        "type": "object",
+        "properties": {
+          "draftToken": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "currentStep": {
+            "type": "string"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppDraftStepPayloadDto"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppDraftAttachmentSummaryDto"
+            }
+          }
+        }
+      },
+      "AppDraftStepPayloadDto": {
+        "required": [
+          "stepKey",
+          "payloadJson",
+          "isComplete",
+          "updatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "stepKey": {
+            "type": "string"
+          },
+          "payloadJson": {
+            "type": "string"
+          },
+          "isComplete": {
+            "type": "boolean"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AppDraftStepSaveResponseDto": {
+        "required": [
+          "stepKey",
+          "isComplete",
+          "progressPercent",
+          "currentStep",
+          "errors"
+        ],
+        "type": "object",
+        "properties": {
+          "stepKey": {
+            "type": "string"
+          },
+          "isComplete": {
+            "type": "boolean"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "currentStep": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppRentalApplicationValidationErrorDto"
+            }
+          }
+        }
+      },
+      "AppLeaseCheckoutSessionDto": {
+        "required": [
+          "paymentPublicId",
+          "purpose",
+          "amountCents",
+          "currency",
+          "status",
+          "checkoutSessionId",
+          "clientSecret",
+          "stripeAccountId",
+          "leasePublicId"
+        ],
+        "type": "object",
+        "properties": {
+          "paymentPublicId": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "checkoutSessionId": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          },
+          "stripeAccountId": {
+            "type": "string"
+          },
+          "leasePublicId": {
+            "type": "string"
+          }
+        }
+      },
+      "AppMerchantBankAccountDto": {
+        "required": [
+          "displayName",
+          "type",
+          "isDefaultIncoming",
+          "supportsIncomingPayments",
+          "isEnabled",
+          "last4",
+          "provisioningState",
+          "verificationState"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "isDefaultIncoming": {
+            "type": "boolean"
+          },
+          "supportsIncomingPayments": {
+            "type": "boolean"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          },
+          "last4": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "provisioningState": {
+            "type": "string"
+          },
+          "verificationState": {
+            "type": "string"
+          }
+        }
+      },
+      "AppOrganizationContextDto": {
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "branding",
+          "contact",
+          "policies"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "branding": {
+            "$ref": "#/components/schemas/AppBrandingDto"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/AppContactDto"
+          },
+          "policies": {
+            "$ref": "#/components/schemas/AppOrganizationPoliciesDto"
+          }
+        }
+      },
+      "AppOrganizationPoliciesDto": {
+        "required": [
+          "applicationsEnabled",
+          "onlinePaymentsEnabled",
+          "applicationFeeEnabled"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationsEnabled": {
+            "type": "boolean"
+          },
+          "onlinePaymentsEnabled": {
+            "type": "boolean"
+          },
+          "applicationFeeEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AppPaymentReadinessDto": {
+        "required": [
+          "onlinePaymentsEnabled",
+          "merchantStatus",
+          "chargesEnabled",
+          "payoutsEnabled",
+          "requirementsDue",
+          "canCreateCheckoutSession",
+          "unavailableReason",
+          "bankAccounts"
+        ],
+        "type": "object",
+        "properties": {
+          "onlinePaymentsEnabled": {
+            "type": "boolean"
+          },
+          "merchantStatus": {
+            "type": "string"
+          },
+          "chargesEnabled": {
+            "type": "boolean"
+          },
+          "payoutsEnabled": {
+            "type": "boolean"
+          },
+          "requirementsDue": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "canCreateCheckoutSession": {
+            "type": "boolean"
+          },
+          "unavailableReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankAccounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppMerchantBankAccountDto"
+            }
+          }
+        }
+      },
+      "AppPaymentStatusDto": {
+        "required": [
+          "paymentPublicId",
+          "purpose",
+          "amountCents",
+          "currency",
+          "status",
+          "applicationPublicId",
+          "screeningStatus",
+          "createdAtUtc",
+          "processedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "paymentPublicId": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "applicationPublicId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "screeningStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "processedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "leasePublicId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AppRentalApplicationValidationErrorDto": {
+        "required": [
+          "field",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "AppSaveApplicationStepDto": {
+        "required": [
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        }
+      },
+      "AppScreeningCheckoutSessionDto": {
+        "required": [
+          "paymentPublicId",
+          "purpose",
+          "amountCents",
+          "currency",
+          "status",
+          "checkoutSessionId",
+          "clientSecret",
+          "stripeAccountId",
+          "applicationPublicId"
+        ],
+        "type": "object",
+        "properties": {
+          "paymentPublicId": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "checkoutSessionId": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          },
+          "stripeAccountId": {
+            "type": "string"
+          },
+          "applicationPublicId": {
+            "type": "string"
+          }
+        }
+      },
+      "AppSendApplicationOtpDto": {
+        "required": [
+          "listingPublicId",
+          "email",
+          "acknowledgedApplicantPrivacy",
+          "consentedToElectronicRecords",
+          "applicantPrivacyDocumentId",
+          "applicantPrivacyVersion",
+          "applicantPrivacyContentSha256",
+          "electronicRecordsDocumentId",
+          "electronicRecordsVersion",
+          "electronicRecordsContentSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "acknowledgedApplicantPrivacy": {
+            "type": "boolean"
+          },
+          "consentedToElectronicRecords": {
+            "type": "boolean"
+          },
+          "applicantPrivacyDocumentId": {
+            "type": "string"
+          },
+          "applicantPrivacyVersion": {
+            "type": "string"
+          },
+          "applicantPrivacyContentSha256": {
+            "type": "string"
+          },
+          "electronicRecordsDocumentId": {
+            "type": "string"
+          },
+          "electronicRecordsVersion": {
+            "type": "string"
+          },
+          "electronicRecordsContentSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "AppSendApplicationOtpResponseDto": {
+        "required": [
+          "otpSent",
+          "expiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "otpSent": {
+            "type": "boolean"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AppSubmitApplicationDto": {
+        "required": [
+          "certifiedApplication",
+          "typedSignature",
+          "rentalApplicationTermsDocumentId",
+          "rentalApplicationTermsVersion",
+          "rentalApplicationTermsContentSha256",
+          "certificationTextSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "certifiedApplication": {
+            "type": "boolean"
+          },
+          "typedSignature": {
+            "type": "string"
+          },
+          "rentalApplicationTermsDocumentId": {
+            "type": "string"
+          },
+          "rentalApplicationTermsVersion": {
+            "type": "string"
+          },
+          "rentalApplicationTermsContentSha256": {
+            "type": "string"
+          },
+          "certificationTextSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "AppSubmitApplicationResponseDto": {
+        "required": [
+          "applicationPublicId",
+          "stage",
+          "screeningStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationPublicId": {
+            "type": "string"
+          },
+          "stage": {
+            "type": "string"
+          },
+          "screeningStatus": {
+            "type": "string"
+          }
+        }
+      },
+      "AppUploadDraftAttachmentDto": {
+        "required": [
+          "attachmentType",
+          "fileName",
+          "contentType",
+          "contentBase64"
+        ],
+        "type": "object",
+        "properties": {
+          "attachmentType": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "contentBase64": {
+            "type": "string"
+          }
+        }
+      },
+      "AppVerifyApplicationOtpDto": {
+        "required": [
+          "listingPublicId",
+          "email",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "AppVerifyApplicationOtpResponseDto": {
+        "required": [
+          "draftToken",
+          "currentStep",
+          "progressPercent",
+          "expiresAtUtc",
+          "isResumed"
+        ],
+        "type": "object",
+        "properties": {
+          "draftToken": {
+            "type": "string"
+          },
+          "currentStep": {
+            "type": "string"
+          },
+          "progressPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isResumed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "JsonElement": {},
+      "PlatformAppActionSubmitDto": {
+        "required": [
+          "extensionKey",
+          "resourcePublicId",
+          "input",
+          "idempotencyKey"
+        ],
+        "type": "object",
+        "properties": {
+          "extensionKey": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "resourcePublicId": {
+            "maxLength": 29,
+            "minLength": 29,
+            "pattern": "^corg_[a-z0-9_-]{24}$",
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/PlatformAvailabilityActionInput"
+          },
+          "idempotencyKey": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "notBeforeUtc": {
+            "pattern": "Z$",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Optional UTC timestamp ending in Z. The current time is used when omitted or null.",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlatformAppActionWorkDto": {
+        "required": [
+          "workId",
+          "status",
+          "attemptCount",
+          "nextAttemptAtUtc",
+          "errorCode",
+          "result"
+        ],
+        "type": "object",
+        "properties": {
+          "workId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "attemptCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "nextAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "errorCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "result": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PlatformAvailabilityActionResult"
+              }
+            ]
+          }
+        }
+      },
+      "PlatformAvailabilityActionInput": {
+        "required": [
+          "listingPublicId",
+          "startDate"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "maxLength": 29,
+            "minLength": 29,
+            "pattern": "^clst_[a-z0-9_-]{24}$",
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlatformAvailabilityActionResult": {
+        "required": [
+          "listingPublicId",
+          "unitPublicId",
+          "startDate",
+          "endDate",
+          "isAvailable",
+          "reasonCode"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "unitPublicId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "isAvailable": {
+            "type": "boolean"
+          },
+          "reasonCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublishedListingCardDto": {
+        "required": [
+          "listingPublicId",
+          "unitPublicId",
+          "propertyPublicId",
+          "propertyName",
+          "unitName",
+          "bedrooms",
+          "bathrooms",
+          "areaSqft",
+          "rent",
+          "currency",
+          "availableFrom",
+          "applyEligible",
+          "city",
+          "state",
+          "coverImageUrl",
+          "applicationUrl",
+          "publishedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "unitPublicId": {
+            "type": "string"
+          },
+          "propertyPublicId": {
+            "type": "string"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "unitName": {
+            "type": "string"
+          },
+          "bedrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "areaSqft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "rent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "availableFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "applyEligible": {
+            "type": "boolean"
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "coverImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "applicationUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "rentPeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublishedListingDetailDto": {
+        "required": [
+          "listingPublicId",
+          "unitPublicId",
+          "propertyPublicId",
+          "propertyName",
+          "unitName",
+          "bedrooms",
+          "bathrooms",
+          "areaSqft",
+          "rent",
+          "currency",
+          "availableFrom",
+          "applyEligible",
+          "description",
+          "city",
+          "state",
+          "postalCode",
+          "country",
+          "photoUrls",
+          "amenities",
+          "applicationUrl",
+          "virtualTourUrl",
+          "publishedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "listingPublicId": {
+            "type": "string"
+          },
+          "unitPublicId": {
+            "type": "string"
+          },
+          "propertyPublicId": {
+            "type": "string"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "unitName": {
+            "type": "string"
+          },
+          "bedrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "areaSqft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "rent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "availableFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "applyEligible": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "country": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "photoUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicationUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "virtualTourUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "rentPeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "coverImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublishedListingPageDto": {
+        "required": [
+          "total",
+          "page",
+          "pageSize",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublishedListingCardDto"
+            }
+          }
+        }
+      },
+      "UnitfieldProblemDetails": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supportCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "UnitfieldValidationProblemDetails": {
+        "required": [
+          "errors",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supportCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter a Unitfield API access token for an active app installation and current grant.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "description": "OAuth2 with Unitfield Auth for installed apps. Request audience=unitfield-api when obtaining an API token.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "listings:read": "Read published listings",
+              "availability:read": "Read rental availability",
+              "applications:write": "Create rental applications",
+              "applications:read": "Read rental applications",
+              "payments:create": "Create payment sessions",
+              "payments:read": "Read payment status",
+              "files:write": "Upload permitted files",
+              "files:read": "Read permitted files",
+              "leases:read": "Read leases",
+              "webhooks:manage": "Manage event subscriptions",
+              "webhooks:read": "Read event subscriptions",
+              "resident-requests:create": "Create maintenance requests for residents"
+            }
+          },
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.unitfield.com/oauth2/auth",
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "listings:read": "Read published listings",
+              "availability:read": "Read rental availability",
+              "applications:write": "Create rental applications",
+              "applications:read": "Read rental applications",
+              "payments:create": "Create payment sessions",
+              "payments:read": "Read payment status",
+              "files:write": "Upload permitted files",
+              "files:read": "Read permitted files",
+              "leases:read": "Read leases",
+              "webhooks:manage": "Manage event subscriptions",
+              "webhooks:read": "Read event subscriptions",
+              "resident-requests:create": "Create maintenance requests for residents"
+            }
+          }
+        }
+      },
+      "OAuth2User": {
+        "type": "oauth2",
+        "description": "OAuth2 authorization-code authentication for interactive Unitfield users. App installation management operations also require 'X-Tenant-Id' and tenant permissions.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.unitfield.com/oauth2/auth",
+            "tokenUrl": "https://auth.unitfield.com/oauth2/token",
+            "scopes": {
+              "openid": "OpenID Connect",
+              "profile": "User profile",
+              "email": "Email address",
+              "unitfield-api": "Unitfield Platform API"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Apps Organization",
+      "description": "The organization an installed app runs for."
+    },
+    {
+      "name": "Apps Listings",
+      "description": "Published listings and availability."
+    },
+    {
+      "name": "Apps Rental Applications",
+      "description": "Verified rental application drafts, attachments and submission."
+    },
+    {
+      "name": "Apps Payments",
+      "description": "Provider-confirmed payment sessions and status."
+    },
+    {
+      "name": "Apps Actions",
+      "description": "Reviewed app actions queued against current records."
+    }
+  ]
+}
