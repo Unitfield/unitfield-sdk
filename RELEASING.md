@@ -5,8 +5,8 @@ Three packages are published from this repository:
 | Package | Directory | On npm |
 | --- | --- | --- |
 | `@unitfield/sdk` | `packages/sdk` | yes |
-| `@unitfield/react` | `packages/react` | **not yet: first publish is manual** |
-| `create-unitfield-site` | `packages/create-unitfield-site` | **not yet: first publish is manual** |
+| `@unitfield/react` | `packages/react` | yes (0.1.0, first published 2026-11-02) |
+| `create-unitfield-site` | `packages/create-unitfield-site` | yes (0.1.0, first published 2026-11-02) |
 
 `examples/*` are never published.
 
