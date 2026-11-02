@@ -8,6 +8,18 @@ importers:
 
   .: {}
 
+  packages/create-unitfield-site:
+    devDependencies:
+      '@types/node':
+        specifier: 24.19.2
+        version: 24.19.2
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@types/node@24.19.2)(jsdom@30.0.1)(vite@8.3.5(@types/node@24.19.2))
+
   packages/react:
     devDependencies:
       '@tanstack/react-query':

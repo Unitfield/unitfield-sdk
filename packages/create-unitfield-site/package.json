@@ -1,0 +1,51 @@
+{
+  "name": "create-unitfield-site",
+  "version": "0.1.0",
+  "description": "Scaffold a Next.js site on the Unitfield storefront API: npx create-unitfield-site my-site",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "bin": {
+    "create-unitfield-site": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pretest": "pnpm run build",
+    "test": "vitest --run --maxWorkers=1",
+    "smoke": "node scripts/smoke.mjs",
+    "prepack": "npm run build"
+  },
+  "files": [
+    "dist",
+    "template",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unitfield/unitfield-sdk.git",
+    "directory": "packages/create-unitfield-site"
+  },
+  "bugs": {
+    "url": "https://github.com/Unitfield/unitfield-sdk/issues"
+  },
+  "homepage": "https://github.com/Unitfield/unitfield-sdk/tree/main/packages/create-unitfield-site#readme",
+  "keywords": [
+    "unitfield",
+    "create",
+    "scaffold",
+    "nextjs",
+    "rental",
+    "property-management"
+  ],
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}

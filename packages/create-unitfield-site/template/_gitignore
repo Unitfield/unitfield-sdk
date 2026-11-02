@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# local environment: keys and secrets stay out of git
+.env*
+!.env.example
+
+# misc
+.DS_Store
+npm-debug.log*
