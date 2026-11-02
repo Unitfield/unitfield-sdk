@@ -1,0 +1,39 @@
+---
+title: Vue and Svelte
+description: Use the core SDK from any framework.
+order: 9
+---
+
+`@unitfield/sdk` has no framework code, so Vue, Svelte, Solid, Angular and plain scripts all use it the same way. The repository
+has a minimal listings page for Vue 3 and for Svelte 5 in `examples/vue` and `examples/svelte`. Both are single-page apps built with
+Vite.
+
+```bash
+npm install @unitfield/sdk
+```
+
+```ts
+// storefront.ts
+import { createStorefrontClient } from "@unitfield/sdk";
+
+export const storefront = createStorefrontClient({
+  publishableKey: import.meta.env.VITE_UNITFIELD_PUBLISHABLE_KEY,
+  baseUrl: import.meta.env.VITE_UNITFIELD_API_URL || "https://api.unitfield.com",
+});
+```
+
+```ts
+const controller = new AbortController();
+const page = await storefront.listings.list({ city: "Austin", limit: 24 }, { signal: controller.signal });
+```
+
+Both examples:
+
+- read the key and API origin from `VITE_` variables, which Vite exposes to the browser (a publishable key is meant to be public);
+- list homes with a city and bedroom filter, show one home from the URL hash, and link to the home's `applyUrl`;
+- cancel an older search when a newer one starts, with an `AbortController`;
+- show `isUnitfieldError` messages without leaking internals.
+
+They run in the browser, so the origin you serve them from must be on the key (`http://localhost` for a test key). See
+[Testing with test keys](./testing-with-test-keys). In a framework with a server side (Nuxt, SvelteKit), read on the server
+instead: no origin is needed there, and the page arrives rendered.

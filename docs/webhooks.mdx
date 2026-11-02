@@ -1,0 +1,113 @@
+---
+title: Webhooks and revalidation
+description: Verify Unitfield webhooks, and refresh your site's cached reads when something is published.
+order: 5
+---
+
+Webhooks tell your server that something changed, so a cached site can refresh at once instead of waiting for a timer. A
+delivery is an HTTPS `POST` with a JSON body and a signature.
+
+## Where subscriptions come from today
+
+A webhook subscription belongs to an **installed app** and is created through the platform API, with a signed-in staff
+session. With the SDK:
+
+```ts
+import { createPlatformClient } from "@unitfield/sdk";
+
+const platform = createPlatformClient({ tokenProvider }); // a staff user's token, not an app token
+const created = await platform.webhooks.create(organizationId, installationId, {
+  targetUrl: "https://www.example.com/api/unitfield/webhook",
+  events: ["listing.updated", "site.published"],
+});
+created.signingSecret; // shown once: store it now
+```
+
+`platform.webhooks` also lists subscriptions, rotates the secret, sends a `webhook.test` delivery, and shows deliveries,
+dead-lettered deliveries and replays. `platform.webhooks.catalog(organizationId)` lists the event names, and `policy` shows the
+retry and timeout policy: read it instead of hard-coding it.
+
+An app is only told about events its approved scopes allow. The events below need `listings:read` or `applications:read`.
+
+**Website > Developers cannot create a subscription for a site you build yourself yet.** Its webhooks card says so. Until it can,
+use the platform API above.
+
+## Events a site cares about
+
+| Event | Needs scope | Data |
+| --- | --- | --- |
+| `listing.published`, `listing.updated`, `listing.unpublished`, `listing.availability_changed` | `listings:read` | `listingPublicId`, `propertyPublicId`, `unitPublicId`, status and visibility changes, `publishedAtUtc`, `updatedAtUtc`, `occurredAtUtc`, `availableFromUtc`, `isAvailable` (only the ones the event has) |
+| `site.published`, `site.unpublished` | `listings:read` | `sitePublicId`, `revision`, `hosts`, `occurredAtUtc` |
+| `inquiry.created` | `applications:read` | `kind`, `listingPublicId`, `propertyPublicId`, `occurredAtUtc` |
+| `rental_application.submitted` | `applications:read` | `applicationPublicId`, `listingPublicId`, `status`, `submittedAtUtc`, and similar |
+
+An `inquiry.created` event says that one arrived and about what. It never carries the visitor's name, email, phone or message.
+
+Every delivery has the same envelope:
+
+```json
+{ "id": "…", "type": "listing.updated", "created": "2026-11-02T17:00:00Z", "version": "1", "data": { "listingPublicId": "clst_…" } }
+```
+
+and these headers: `X-Unitfield-Signature`, `X-Unitfield-Delivery` and `X-Unitfield-Event`.
+
+## Verify every delivery
+
+`X-Unitfield-Signature` is `t=<unix seconds>,v1=<hex>`: an HMAC-SHA-256, keyed with the subscription's signing secret, over
+`<t>.<raw body>`. Verify the **raw bytes** before you parse anything.
+
+```ts
+import { createWebhookVerifier, WebhookVerificationError } from "@unitfield/sdk/server";
+
+const webhooks = createWebhookVerifier({ secret: [process.env.WEBHOOK_SECRET!] }); // old and new while rotating
+
+export async function POST(request: Request) {
+  try {
+    const { event, delivery } = await webhooks.constructEvent(await request.text(), request.headers);
+    // dedupe on delivery.deliveryId, then act on event.type
+  } catch (error) {
+    if (error instanceof WebhookVerificationError) return new Response("Invalid webhook.", { status: 400 });
+    throw error;
+  }
+  return Response.json({ received: true });
+}
+```
+
+The verifier:
+
+- compares in constant time;
+- accepts a timestamp within 300 seconds of now, in either direction;
+- with the default in-memory replay store, rejects a signature it has already accepted. Retries are signed again with a new
+  timestamp, so a real retry passes while a captured request replayed later does not. With more than one process, pass a shared
+  `replayStore` (Redis `SET key 1 NX PX ttl` fits);
+- honors several secrets and several `v1` values, so a secret rotates without dropped deliveries;
+- never parses a body that failed verification.
+
+A failure is a `WebhookVerificationError` with a `reason` (`missing_signature`, `malformed_signature`,
+`timestamp_out_of_tolerance`, `signature_mismatch`, `replayed`, `payload_too_large`). Answer with a 4xx and do not leak the reason.
+
+Respond quickly with a 2xx once the event is stored, and make your handler idempotent on `delivery.deliveryId` (the event id,
+stable across retries).
+
+## Revalidating a Next.js site
+
+The [starter](./nextjs-starter) tags every API read `unitfield` and ships a route that drops the tag when a verified event
+arrives:
+
+```ts
+// app/api/unitfield/webhook/route.ts
+import { revalidateTag } from "next/cache";
+
+if (event.type.startsWith("listing.") || event.type.startsWith("site.")) {
+  revalidateTag("unitfield", { expire: 0 }); // the next request fetches fresh data
+}
+```
+
+`{ expire: 0 }` means no stale copy is served. Use `revalidateTag("unitfield", "max")` instead to keep serving the stale page
+while it refreshes.
+
+Without webhooks the site still refreshes: its reads are cached for 60 seconds, as the API itself says
+(`Cache-Control: max-age=60`).
+
+For other frameworks, the shape is the same: verify, then clear whatever cache holds Storefront API reads (a CDN purge by tag,
+`revalidatePath`, a KV key).

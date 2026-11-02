@@ -11,6 +11,14 @@
     "gen:api": "pnpm --filter @unitfield/sdk gen:api",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
-    "build": "pnpm -r --if-present build"
+    "build": "pnpm -r --if-present build",
+    "docs:reference": "node scripts/generate-reference.mjs",
+    "docs:reference:check": "node scripts/generate-reference.mjs --check",
+    "docs:check": "node scripts/check-docs.mjs"
+  },
+  "devDependencies": {
+    "@mdx-js/mdx": "3.1.1",
+    "remark-frontmatter": "5.0.0",
+    "remark-gfm": "4.0.1"
   }
 }

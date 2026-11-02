@@ -1,0 +1,46 @@
+---
+title: The account domain
+description: Keep sign-in and the hosted flows on a domain in your own family.
+order: 6
+---
+
+Your hosted flows (apply, sign-in, account) live on your organization's Unitfield address, for example `{slug}.unitfield.app`,
+or on a custom domain you connected for your site. An **account domain** is a custom domain, usually a subdomain such as
+`account.example.com`, that serves **only** those flows, so a site you build yourself on `www.example.com` can send
+customers to a hosted address that is in your domain family.
+
+On an account domain Unitfield serves `/sign-in`, `/auth/*`, `/account/*` and `/apply/*`. Your public pages are not served
+there: your SDK site is.
+
+## Setting it up
+
+An account domain is one of the roles a site domain can have, next to `primary` and `redirect`:
+
+1. Add the domain like any custom domain (a CNAME to Unitfield's target, then certificate validation). Apex domains cannot be
+   account domains: use a subdomain.
+2. Give it the `account` role: `POST /api/platform/v1/site/domains` with `"role": "account"` when you add it, or
+   `PUT /api/platform/v1/site/domains/{domainId}/role` for one you already added. Both need a signed-in staff session with access
+   to site domains; adding a domain asks the staff user to confirm it is them.
+3. Wait until the domain is **Active**.
+
+The Website hub's domain wizard does not offer the account role yet and does not list account domains among your site's
+addresses; use the API until it does.
+
+## What it changes, and what it does not
+
+- Visitors on the account host see the hosted account, sign-in and apply pages, and a `404` for public pages.
+- The `hostedUrls` of `GET /site` (`applyBaseUrl`, `signInUrl`, `accountUrl`) are built from the **primary** host. They do not
+  switch to an account domain. Link to the account domain yourself:
+
+```ts
+const account = "https://account.example.com";
+const applyHref = (listing: { unitPublicKey: string }) => `${account}/apply/${encodeURIComponent(listing.unitPublicKey)}`;
+const accountHref = `${account}/account`;
+```
+
+  A listing's own `applyUrl` also names the primary host.
+
+- It does not add a redirect URI. The redirect URIs of your key (see [Customer sign-in](./customer-sign-in)) are the addresses
+  on **your** site that receive the sign-in callback.
+- The session on the account host is the hosted session. Your SDK site has its own tokens: see
+  [Customer sign-in](./customer-sign-in).

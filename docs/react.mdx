@@ -1,0 +1,56 @@
+---
+title: React
+description: The provider, hooks and headless components of @unitfield/react.
+order: 8
+---
+
+```bash
+npm install @unitfield/react @unitfield/sdk
+```
+
+`@unitfield/react` wraps `@unitfield/sdk` for React 18 and 19. The SDK is a peer dependency so your app and the package share one
+copy. The package adds no styles. The full reference is the package README; the short version is here.
+
+## Read data
+
+```tsx
+import { UnitfieldProvider, useListings, ListingGrid, ListingTitle, ListingPrice, ApplyButton } from "@unitfield/react";
+
+<UnitfieldProvider publishableKey="pk_test_…">
+  <Homes />
+</UnitfieldProvider>;
+
+function Homes() {
+  const { data, status } = useListings({ city: "Austin", limit: 12 });
+  if (status === "loading") return <p>Loading…</p>;
+  return (
+    <ListingGrid listings={data?.items ?? []} empty={<p>No homes yet.</p>}>
+      {(listing) => (
+        <>
+          <ListingTitle listing={listing} />
+          <ListingPrice listing={listing} />
+          <ApplyButton listing={listing} />
+        </>
+      )}
+    </ListingGrid>
+  );
+}
+```
+
+The hooks are `useSite`, `useListings`, `useListing`, `useCustomer` and `useSignIn`; `useUnitfield` returns the client for
+everything else. A read hook returns `{ data, error, status, isLoading, refetch }`.
+
+They keep no cache of their own and fetch nothing while rendering. Hand a server-read result to `initialData` and the hook starts
+from it, or use `unitfieldQueries(client)` with TanStack Query to get a real cache (this package does not depend on it).
+
+## Components
+
+The headless parts (`ListingGrid`, `ListingImage`, `ListingTitle`, `ListingPrice`, `ListingFacts`, `ListingLocation`,
+`ListingAvailability`, `ApplyButton`) have no state and no hooks, so they render in React Server Components too. They return one
+element each and add no class names.
+
+## Sign-in
+
+`UnitfieldProvider` takes an `auth` object (the SDK's `CustomerAuth` options) to turn on `useSignIn` and `useCustomer` for a
+single-page app. Tokens are kept in memory. A server-rendered app should use the server flow in
+[Customer sign-in](./customer-sign-in) instead and use no sign-in hooks.

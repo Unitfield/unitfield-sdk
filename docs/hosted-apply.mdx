@@ -1,0 +1,63 @@
+---
+title: Hosted apply
+description: Send applicants to the apply page Unitfield hosts for you.
+order: 4
+---
+
+Rental applications are long, regulated and tied to screening, payment and signing. Unitfield hosts that flow on your
+organization's address, and your site **links to it**. You do not rebuild it.
+
+## The link
+
+Every listing carries `applyUrl`:
+
+```ts
+const { items } = await storefront.listings.list();
+items[0].applyUrl; // "https://{your host}/apply/{unitPublicKey}", or null
+```
+
+- `applyUrl` is `null` when the home is not taking applications (`acceptsApplications` is `false`). Show a note instead of a button.
+- The URL honors your settings. Do not build it from the unit key yourself unless you have to: the site's
+  `hostedUrls.applyBaseUrl` is the base (`{applyBaseUrl}/{unitPublicKey}`), and the API decides when a link exists.
+- It is an absolute `https` URL on your Unitfield-hosted address.
+
+With React, or any framework, it is a plain link:
+
+```tsx
+import { ApplyButton } from "@unitfield/react";
+
+<ApplyButton listing={listing} className="button">Apply</ApplyButton>
+// renders nothing when applyUrl is null; pass fallback={<p>Applications are closed.</p>} to show something
+```
+
+`ApplyButton` renders an `<a>` and only accepts `http(s)` URLs.
+
+## What happens there
+
+The applicant continues on your hosted page: they confirm their email with a one-time code, the draft saves as they go, and they
+finish with the household details, consent, screening and signing steps you have turned on. The application, the applicant's
+data and the status page live in Unitfield, branded with your organization's logo and colors. Your site never handles them.
+
+`GET /site` returns `hostedUrls` for the other hosted pages:
+
+| Field | Page |
+| --- | --- |
+| `applyBaseUrl` | `{host}/apply`: the apply flow, `/apply/{unitPublicKey}` for one home. |
+| `signInUrl` | `{host}/sign-in`: sign in to the hosted account. |
+| `accountUrl` | `{host}/account`: the hosted resident account. |
+
+`{host}` is the primary host of your site today. If you set up an [account domain](./account-domain), these URLs still name the
+primary host.
+
+## Knowing when someone applied
+
+To react to submissions, subscribe to the `rental_application.submitted` webhook (it needs the `applications:read` scope). See
+[Webhooks](./webhooks) for how subscriptions are created today.
+
+## Building your own apply screens
+
+The SDK also has `ApplicantClient` (`/api/customer/v1/applications`) for a signed-in customer: drafts, steps, household,
+consent, attachments, submit, status, screening and signing handoffs. It needs a customer access token with the
+`applications:read` and `applications:write` scopes (see [Customer sign-in](./customer-sign-in)). The hosted flow is the supported
+path; `ApplicantClient` is there for teams that must own the screens. Operations that create records need a caller-chosen
+`idempotencyKey`.

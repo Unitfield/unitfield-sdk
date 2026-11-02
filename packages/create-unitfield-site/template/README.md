@@ -46,7 +46,8 @@ there: the draft, the sign-in and the submission all live in Unitfield. The list
 when a home is not taking applications.
 
 **My account** links to the hosted account (`hostedUrls.accountUrl` from `/site`). It has its own sign-in on your Unitfield
-domain: signing in on this site does not sign the person in there, and the other way round.
+domain: signing in on this site does not create a session there. (A customer who already has a hosted session passes
+through this site's sign-in without another code.)
 
 ## Customer sign-in
 

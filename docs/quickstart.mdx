@@ -1,0 +1,131 @@
+---
+title: Quickstart
+description: From a publishable key to a list of homes in a few minutes.
+order: 1
+---
+
+## 1. Get a publishable key
+
+In Unitfield open **Website > Developers**. Create a **Test** key, copy it, and add the address you are developing on under
+**Allowed origins**:
+
+- `http://localhost` (without a port) covers every port on your machine. A test key accepts it; a live key never does.
+- A live key takes exact `https` origins only, for example `https://www.example.com`.
+
+A key starts with `pk_test_` or `pk_live_`. It is public by design. It can read your published listings, send an inquiry and
+start a sign-in. It cannot read anything private.
+
+Creating or revoking a key asks you to confirm it is you.
+
+## 2. Install
+
+```bash
+npm install @unitfield/sdk
+```
+
+The package is ESM only and has no runtime dependencies.
+
+## 3. Read your homes
+
+```ts
+import { createStorefrontClient } from "@unitfield/sdk";
+
+const storefront = createStorefrontClient({ publishableKey: "pk_test_…" });
+// baseUrl defaults to https://api.unitfield.com
+
+const site = await storefront.site.get();
+console.log(site.brand.name, site.hostedUrls.applyBaseUrl);
+
+const { items, nextCursor } = await storefront.listings.list({ city: "Austin", bedroomsMin: 2, sort: "rent", limit: 12 });
+for (const listing of items) {
+  console.log(listing.title, listing.rent, listing.applyUrl);
+}
+
+const detail = await storefront.listings.get(items[0].listingPublicId);
+console.log(detail.description, detail.photos.length);
+```
+
+`listings.list` takes these filters, all optional: `bedroomsMin`, `bedroomsMax`, `bathroomsMin`, `rentMin`, `rentMax`,
+`availableBy` (a date, or a `Date`), `propertyId`, `city`, `unitPublicKey`, `sort` (`newest`, `rent`, `rent_desc` or
+`availability`), `limit` (at most 50) and `cursor`. There is no pet or lease-term filter: nothing backs one.
+
+To walk every page, use the iterator:
+
+```ts
+for await (const listing of storefront.listings.iterate({ city: "Austin" }, { maxItems: 100 })) {
+  console.log(listing.title);
+}
+```
+
+### What a listing has
+
+A card (`ListingSummary`) has `listingPublicId`, `unitPublicKey`, `title`, `propertyName`, `unitName`, `bedrooms`,
+`bathrooms`, `areaSqft`, `rent`, `currency`, `rentPeriod`, `availableFrom`, `city`, `state`, `coverImageUrl`,
+`latitude` and `longitude` (null when the address has not been located) and two fields about applying:
+
+- `acceptsApplications` says whether the home takes applications;
+- `applyUrl` is the hosted apply page, or `null` when applications are closed. Use it as is. See [Hosted apply](./hosted-apply).
+
+`listings.get` adds the description, address, all photos, amenities, a virtual tour URL and a summary of the property.
+
+## 4. Where to call it from
+
+**On a server** (a Next.js Server Component, a Node script, an edge function): no `Origin` header is sent, so the key alone is
+enough and you need no allowed origin.
+
+**In a browser**: the request carries your page's `Origin`, and the API answers `401` unless that exact origin is on the key.
+A key that has no origins yet cannot be used from a browser at all.
+
+## Caching
+
+Reads answer with `Cache-Control: public, max-age=60, stale-while-revalidate=300` and a strong `ETag`, so browsers and CDNs
+cache them for a minute. The client sets no `cache` option of its own. Pass `fetchOptions` to use your framework's cache:
+
+```ts
+const storefront = createStorefrontClient({ publishableKey, fetchOptions: { next: { revalidate: 60, tags: ["unitfield"] } } });
+```
+
+To refresh sooner when something is published, see [Webhooks and revalidation](./webhooks).
+
+## Limits
+
+Reads are limited to 600 per minute for each key and address, and 6,000 per minute for each key. Inquiries are limited to
+5 per hour for each key and address, and 100 per day for each key. The SDK retries `GET` requests that fail with a network
+error, a timeout, `408`, `429`, `502`, `503` or `504` (twice by default, honoring `Retry-After` up to 30 seconds).
+
+## Errors
+
+Every failure is a `UnitfieldError`. Non-2xx answers are `UnitfieldApiError` subclasses with the status and the API `code`:
+
+```ts
+import { AuthenticationError, NotFoundError, RateLimitError, isUnitfieldError } from "@unitfield/sdk";
+
+try {
+  await storefront.listings.get(id);
+} catch (error) {
+  if (error instanceof NotFoundError) return null;
+  if (error instanceof AuthenticationError) console.error("Check the key and its allowed origins.");
+  if (error instanceof RateLimitError) console.error(`Retry in ${error.retryAfterSeconds}s`);
+  throw error;
+}
+```
+
+A `401` from the Storefront API means the key is missing, revoked, unknown, or that the request came from an origin the key does
+not allow. The API answers all four the same way.
+
+## Send an inquiry
+
+```ts
+await storefront.inquiries.create({
+  kind: "tour", // or "contact"
+  name: "Pat Renter",
+  email: "pat@example.com",
+  listingPublicId: listing.listingPublicId,
+  preferredTimes: [new Date("2026-11-20T15:00:00Z")], // up to five
+  turnstileToken, // from a Cloudflare Turnstile widget
+});
+```
+
+The API answers `202` for every accepted request, and also when the Turnstile check failed: nothing is created then, and the
+response does not say so. Staff see a real inquiry as a prospect in People and are notified. See the
+[Known gaps](./index#known-gaps) about the Turnstile site key.

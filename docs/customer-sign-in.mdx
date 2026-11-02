@@ -1,0 +1,139 @@
+---
+title: Customer sign-in with PKCE
+description: Sign renters in to your own site with OpenID Connect, without a secret.
+order: 3
+---
+
+A customer is a renter, applicant or resident of one organization. Unitfield runs a separate sign-in issuer for them
+(`https://id.unitfield.app`), apart from the one operators and staff use. Your site is a **public OAuth client** of that issuer:
+it signs people in with the authorization code flow and **PKCE (S256)**, and it never holds a client secret.
+
+## What you need from Unitfield
+
+1. A publishable key with at least one **redirect URI**. In **Website > Developers**, add the exact URL your site receives the
+   callback on, for example `https://www.example.com/auth/callback`. A test key also accepts `http://localhost:3000/auth/callback`.
+   Redirect URIs are matched as exact strings. No wildcards, no fragments, `https` only for a live key.
+2. Optionally, a post-logout URI, if you want the issuer to send the browser back after it ends a session.
+3. The **client id** of the sign-in client the key owns. A key that has redirect URIs owns one public client; a key without any
+   has none. Website > Developers does not display the client id yet.
+
+The client allows the scopes `openid email offline_access resident:read resident:pay resident:requests applications:read
+applications:write`. Ask only for what the site needs.
+
+## The flow
+
+1. Your site builds an authorization request: a random `state`, a `nonce`, a PKCE verifier and its S256 challenge. It keeps the
+   verifier, `state` and `nonce`, and sends the browser to the issuer.
+2. The issuer sends the customer to **your organization's hosted sign-in page**, where they sign in with a six-digit code sent
+   to their email. With a live hosted session for that organization they pass straight through.
+3. The issuer redirects back to your redirect URI with `code` and `state`.
+4. Your site checks `state`, redeems the code with the verifier (no secret), and validates the ID token (issuer, audience,
+   expiry, nonce).
+5. You hold a short-lived access token (10 minutes), a rotating refresh token (30 days) and an ID token with `sub` (the customer
+   account's public id, `cus_…`), `email` and `email_verified`.
+
+Each organization has its own customer accounts. The same email at two organizations is two accounts.
+
+## With the SDK
+
+`CustomerAuth` and `CustomerSession` do the protocol. They are in `@unitfield/sdk`, are safe in a browser, and need only `fetch`
+and Web Crypto.
+
+### In a browser (single-page app)
+
+```ts
+import { createCustomerAuth, createCustomerSession, saveAuthorizationRequest, takeAuthorizationRequestFor } from "@unitfield/sdk";
+
+const auth = createCustomerAuth({
+  clientId: "…", // your key's sign-in client
+  redirectUri: "https://www.example.com/auth/callback",
+  scopes: ["openid", "email", "offline_access"],
+});
+const session = createCustomerSession({ auth });
+
+// on the "Sign in" click
+const request = await auth.createAuthorizationRequest();
+saveAuthorizationRequest(request); // sessionStorage, under its state
+location.assign(request.url);
+
+// on the callback page
+const saved = takeAuthorizationRequestFor(location.href); // removes it: it can be redeemed once
+if (!saved) throw new Error("No sign-in is in progress.");
+await session.completeSignIn(location.href, saved);
+
+// afterwards
+const tokens = await session.getTokens();
+console.log(tokens?.claims?.email);
+const { logoutUrl } = await session.signOut(); // revokes the refresh token, clears the store
+```
+
+The default store is **in memory**: a reload signs the customer out. A single-page app that wants persistence has to choose where
+tokens live and accept that script on the page can read them. Prefer the server flow below when you have a server.
+
+`session.tokenProvider` is what `createResidentClient` and `createApplicantClient` take as `tokenProvider`. It refreshes the
+access token before it expires. Refreshes are single-flight, and across tabs they are serialized with the Web Locks API, because
+a refresh token that is used twice is treated as stolen and the whole family is revoked: the next call then throws
+`RefreshTokenRevokedError` and the customer has to sign in again.
+
+### On a server (Next.js and similar)
+
+Keep tokens out of JavaScript. `@unitfield/sdk/server` seals them (AES-256-GCM) into httpOnly cookies. This is what the
+[Next.js starter](./nextjs-starter) does:
+
+```ts
+// app/auth/sign-in/route.ts
+import { createAuthorizationRequestCookie } from "@unitfield/sdk/server";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const authRequest = await auth.createAuthorizationRequest();
+  await createAuthorizationRequestCookie(await cookies(), { secret: process.env.UNITFIELD_SESSION_SECRET! }).save(authRequest);
+  return NextResponse.redirect(authRequest.url);
+}
+
+// app/auth/callback/route.ts
+import { createCookieTokenStore } from "@unitfield/sdk/server";
+import type { NextRequest } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.searchParams;
+  const jar = await cookies();
+  const saved = await createAuthorizationRequestCookie(jar, { secret }).take(params.get("state") ?? "");
+  if (!saved) return NextResponse.redirect(new URL("/?sign-in=failed", siteUrl));
+  const tokens = await auth.handleCallback(params, saved);
+  await createCookieTokenStore(jar, { secret }).set(tokens);
+  return NextResponse.redirect(new URL("/", siteUrl));
+}
+```
+
+The cookie names default to `__Host-uf_sdk` and `__Host-uf_sdk_auth`. A `__Host-` cookie must be `Secure`, which `next dev` on
+`http://localhost` is not; pass `secure: false` and a name without the prefix in development (the starter does).
+
+Build the redirect URI and the redirect targets from a configured site URL, not from the request's `Host` header.
+
+**Refresh in a route handler or a Server Action, never while a page renders.** Next cannot write cookies during rendering, and
+refresh tokens rotate: a refresh whose new token is dropped leaves the browser with a spent one, and the next refresh revokes the
+session.
+
+## Signing out
+
+`signOut` revokes the refresh token at the issuer and returns the issuer's end-session URL (`logoutUrl`) and whether the
+revocation succeeded. Clear your own cookie or store either way. Unitfield's customer issuer accepts every login without
+remembering it, so there is no issuer session for the browser to end; the starter revokes, clears and goes home. To use
+`logoutUrl` anyway, register your post-logout URI on the key first.
+
+## Errors
+
+Sign-in failures are `CustomerAuthError` with a `code`: `authorization_denied`, `state_mismatch`, `missing_code`,
+`issuer_mismatch`, `invalid_id_token`, `nonce_mismatch`, `invalid_token_response`, `discovery_failed`, `no_refresh_token` or
+`not_signed_in`. Token endpoint refusals are `OAuthTokenError`, and a refresh token that is no longer valid is
+`RefreshTokenRevokedError`.
+
+The SDK validates ID tokens for issuer, audience, expiry and nonce, not for signature: the token comes straight from the token
+endpoint over TLS, which OpenID Connect allows. The API verifies access tokens itself.
+
+## The hosted account
+
+Signing in to **your** site does not create a session on the hosted account: the two are separate. (A customer who already has
+a hosted session for your organization passes through your sign-in without another code.) See [The account domain](./account-domain) and the hosted links in [Hosted apply](./hosted-apply).

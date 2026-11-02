@@ -1,0 +1,93 @@
+---
+title: The Next.js starter
+description: Scaffold a Next.js site with listings, sign-in and an inquiry form.
+order: 2
+---
+
+```bash
+npx create-unitfield-site my-site
+cd my-site
+npm run dev
+```
+
+The scaffolder asks for your publishable key (Enter skips it), copies a Next.js App Router project, writes `.env.local`, and
+installs dependencies with the package manager that ran it. Everything it creates is yours to change.
+
+Use the options when nobody can answer questions:
+
+```bash
+npx create-unitfield-site my-site --key pk_test_… --package-manager pnpm --yes
+```
+
+`--api-url` changes the API origin (the default is `https://api.unitfield.com`), `--no-install` skips the install. It refuses a
+directory that already holds files and does not create a git repository.
+
+## What you get
+
+| Route | What it does |
+| --- | --- |
+| `/` | Your newest homes. |
+| `/listings` | All homes. A search form (city, bedrooms, highest rent, sort) that lives in the URL, and cursor paging. |
+| `/listings/[listingId]` | One home: photos, facts, amenities, the **Apply** link and an inquiry form. |
+| `/contact` | Your contact details and a general inquiry form. |
+| `/auth/sign-in`, `/auth/callback`, `/auth/sign-out` | Customer sign-in. See [Customer sign-in](./customer-sign-in). |
+| `/api/unitfield/webhook` | Optional: drops cached reads when Unitfield tells you something changed. See [Webhooks](./webhooks). |
+
+The header links to **My account**, the hosted account on your Unitfield domain, using `hostedUrls.accountUrl` from the site.
+**Apply** links to the listing's `applyUrl`. See [Hosted apply](./hosted-apply).
+
+Pins: Next.js 16 (App Router), React 19, `@unitfield/sdk` and `@unitfield/react`, all at exact versions. There is no UI
+library: the stylesheet is one file with a handful of color tokens, and the brand color from your Unitfield settings sets the
+accent (a button's text color is chosen for contrast).
+
+## Environment
+
+The server reads these when a request arrives, never at build time, so one build runs in any environment. The browser gets
+only what the server hands down as props.
+
+| Variable | |
+| --- | --- |
+| `UNITFIELD_PUBLISHABLE_KEY` | Required. Your key. |
+| `UNITFIELD_API_URL` | The API origin. Default `https://api.unitfield.com`. |
+| `UNITFIELD_SITE_URL` | The origin the site is served from. The sign-in redirect URI is built from it. |
+| `UNITFIELD_CLIENT_ID` | The OAuth client id of your key's sign-in client. Sign-in is off while this or the session secret is empty. |
+| `UNITFIELD_SESSION_SECRET` | At least 32 random characters. Seals the session cookie. |
+| `UNITFIELD_ID_URL` | Only when your sign-in issuer is not `https://id.unitfield.app`. |
+| `TURNSTILE_SITE_KEY` | The Cloudflare Turnstile site key the inquiry form renders. |
+| `UNITFIELD_WEBHOOK_SECRET` | The signing secret of your webhook endpoint. Several, comma separated, while rotating. |
+
+## How it fetches and caches
+
+Every page renders per request, so `next build` needs no environment variables and no network. The API reads underneath are
+cached by Next's data cache for 60 seconds under one tag, `unitfield`, and a verified webhook drops that tag.
+
+The layout reads the signed-in customer from a cookie to draw the header. That is why pages are not statically generated. If
+you want static pages with time-based revalidation instead, remove the cookie read from the layout (and with it the header's
+sign-in state) and the `connection()` calls.
+
+If the API cannot be reached and nothing is cached, the layout fails and `app/global-error.tsx` shows a plain message.
+
+## The inquiry form
+
+The form posts from the **browser** to the Unitfield API with your publishable key. That is deliberate: the API limits
+inquiries to 5 per hour for each key and address, so posting from your server would count every visitor as one address.
+
+It follows that the site's origin must be allowed on the key (for development, `http://localhost`), and that the API needs
+a Cloudflare Turnstile token with every inquiry:
+
+- With `TURNSTILE_SITE_KEY` set, the form renders the Turnstile widget and sends its token.
+- Without it, a **development** build sends a placeholder token, which only an API with Turnstile switched off accepts. A
+  **production** build shows your contact details instead of the form.
+
+A token the API rejects is answered like an accepted inquiry and nothing is created, so a site on your own domain cannot rely
+on inquiries until Unitfield gives you a Turnstile site key that works for your domain. See the
+[known gaps](./index#known-gaps).
+
+## Deploying
+
+Set the same variables in your host's environment settings (not only in `.env.local`), set `UNITFIELD_SITE_URL` to the public
+origin, and register `{UNITFIELD_SITE_URL}/auth/callback` under your key's redirect URIs. Add the public origin under Allowed
+origins for the inquiry form. A live key needs exact `https` values; `localhost` is for test keys only.
+
+If you run more than one server process, the webhook route's replay protection is per process. Pass a shared `replayStore`
+(Redis or similar) to `createWebhookVerifier`.

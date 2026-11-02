@@ -1,0 +1,46 @@
+---
+title: Build your own site on Unitfield
+description: What you can build with the Unitfield SDKs, and where to start.
+order: 0
+---
+
+Unitfield runs your rentals. If you want your own website in front of it, in any framework, three things are public and
+typed:
+
+- the **Storefront API**: your published homes, your site's brand and contact details, and an inquiry endpoint, read with a
+  **publishable key** that is safe to put in a web page;
+- **customer sign-in**: OpenID Connect authorization code with PKCE against Unitfield's customer issuer, so a renter can sign
+  in without you running an identity system;
+- **hosted flows**: the apply page and the account page stay on a Unitfield-hosted address, and your site links to them.
+
+Webhooks tell your server when listings or the site change.
+
+## Packages
+
+| Package | Use it for |
+| --- | --- |
+| `@unitfield/sdk` | The typed core. Works in Node 20+, edge runtimes and browsers. Every guide here uses it. |
+| `@unitfield/react` | A provider, hooks and headless components for React. Optional. |
+| `create-unitfield-site` | `npx create-unitfield-site my-site`: a Next.js (App Router) starter with listings, sign-in and an inquiry form. |
+
+## Guides
+
+1. [Quickstart](./quickstart): a publishable key to a list of homes.
+2. [The Next.js starter](./nextjs-starter): what `create-unitfield-site` gives you and how to run it.
+3. [Customer sign-in with PKCE](./customer-sign-in).
+4. [Hosted apply](./hosted-apply): link to the apply page.
+5. [Webhooks and revalidation](./webhooks).
+6. [The account domain](./account-domain).
+7. [Testing with test keys](./testing-with-test-keys).
+8. [React](./react), and [Vue and Svelte](./vue-and-svelte).
+
+The [API reference](./reference) lists every operation in the OpenAPI documents the SDK is generated from.
+
+## Known gaps
+
+These are things the platform does not do yet. Each guide says so where it matters.
+
+- Website > Developers does not show the OAuth client id of a key's sign-in client, which `CustomerAuth` needs.
+- Inquiries need a Cloudflare Turnstile token that Unitfield's API verifies. A site on your own domain has no way to get a
+  site key for that check yet, so inquiries from your own site are accepted by the API but dropped until it exists.
+- Webhook subscriptions belong to an installed app. Website > Developers cannot create one for a site you build yourself yet.

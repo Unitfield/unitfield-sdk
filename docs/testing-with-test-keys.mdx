@@ -1,0 +1,50 @@
+---
+title: Testing with test keys
+description: What a test key is, what it is not, and how to develop against it.
+order: 7
+---
+
+A site can have both **Live** and **Test** publishable keys (Website > Developers switches between them). They differ in one
+way: where they may be used from.
+
+| | Test key (`pk_test_…`) | Live key (`pk_live_…`) |
+| --- | --- | --- |
+| Allowed origins | `https` origins, and `http://localhost` or `http://127.0.0.1` | exact `https` origins only |
+| Sign-in redirect URIs | `https`, and `http://localhost` or `http://127.0.0.1` | exact `https` only |
+| Data | **your real data** | your real data |
+
+A test key is not a sandbox. It reads the same published listings, the same brand and the same contact details as a live key,
+and an inquiry sent with it is a real inquiry that reaches your staff. The SDK reports it as `storefront.mode === "test"`.
+There is no fake data, no fake applicant and no test mode for the hosted apply page.
+
+## Develop locally
+
+1. Create a **Test** key.
+2. Add `http://localhost` (without a port) under its allowed origins. One entry covers every port on your machine. If you add
+   `http://localhost:3000`, only that port works.
+3. For sign-in, add `http://localhost:3000/auth/callback` (the exact URL of your callback) under redirect URIs. Redirect URIs
+   are exact: wildcards are refused.
+4. Put the key in `.env.local` and run your app.
+
+Server-side reads (a Server Component, a script) need no allowed origin at all: they send no `Origin`.
+
+## Before you go live
+
+- Create a **Live** key. Add your production origin and callback URL under it: exact `https` values.
+- Switch the environment variable to the live key and check the site loads from the real origin.
+- Revoke the test key you no longer need. A key can be rotated by creating the new one, switching your site, then revoking
+  the old one; both work until you revoke.
+- Creating or revoking a key asks you to confirm it is you.
+
+## Checking your setup
+
+| You see | Likely cause |
+| --- | --- |
+| `401` from the browser, a server read works | The page's origin is not on the key. |
+| `401` everywhere | The key is revoked, mistyped, or from another site. |
+| An inquiry answers `202` but never arrives | The Turnstile token was rejected. The API answers the same either way. |
+| Sign-in ends on an error page at the issuer | The redirect URI is not an exact match for the one registered, or the key has no redirect URI. |
+| `RateLimitError` | 600 reads per minute per key and address, 5 inquiries per hour per key and address. |
+
+`storefront.hosts.resolve(host)` is anonymous and shows what Unitfield knows about a host. You do not need it for a site that
+carries its own key.
