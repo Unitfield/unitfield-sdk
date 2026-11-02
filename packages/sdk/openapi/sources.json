@@ -1,8 +1,8 @@
 {
-  "$comment": "Each source is one slice of an API OpenAPI document served at {api}/openapi/{document}.json. `include` keeps only paths with one of these prefixes, `exclude` drops paths under its prefixes again; everything not reachable from the kept paths is dropped. The platform slice leaves out site, domain and business-launch management: the SDK does not wrap them. The `v1` document carries the resident, customer-auth, storefront and customer operations side by side, so those four slices are cut from the same download.",
+  "$comment": "Each source is one slice of an API OpenAPI document served at {api}/openapi/{document}.json. `include` keeps only paths with one of these prefixes, `exclude` drops paths under its prefixes again; everything not reachable from the kept paths is dropped. The platform slice leaves out site, domain and business-launch management, private app creation and the consent wording catalog: those are Dashboard operations the SDK does not wrap. The `v1` document carries the resident, customer-auth, storefront and customer operations side by side, so those four slices are cut from the same download.",
   "sources": [
     { "name": "apps", "document": "apps-v1", "include": ["/api/apps/v1/"] },
-    { "name": "platform", "document": "platform-v1", "include": ["/api/platform/v1/"], "exclude": ["/api/platform/v1/site", "/api/platform/v1/public/", "/api/platform/v1/business"] },
+    { "name": "platform", "document": "platform-v1", "include": ["/api/platform/v1/"], "exclude": ["/api/platform/v1/site", "/api/platform/v1/public/", "/api/platform/v1/business", "/api/platform/v1/app-catalog/private/apps", "/api/platform/v1/app-scopes"] },
     { "name": "resident", "document": "v1", "include": ["/api/v1/resident/", "/api/resident/v1/"] },
     { "name": "customer-auth", "document": "v1", "include": ["/api/customer-auth/v1/"] },
     { "name": "storefront", "document": "v1", "include": ["/api/storefront/v1/"] },

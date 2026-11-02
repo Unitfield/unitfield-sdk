@@ -1875,6 +1875,12 @@
               "null",
               "string"
             ]
+          },
+          "accountClientId": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

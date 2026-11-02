@@ -745,14 +745,22 @@ export interface components {
         PlatformAppManifest: {
             allowedOrigins: string[];
             appKey: string;
+            category?: null | string;
+            description?: null | string;
+            developerName?: null | string;
             displayName: string;
             events?: null | components["schemas"]["PlatformEventManifest"][];
             extensions: components["schemas"]["PlatformExtensionManifest"][];
+            iconKey?: null | string;
+            iconUrl?: null | string;
             optionalScopes: string[];
+            privacyUrl?: null | string;
             redirectUris: string[];
             requiredScopes: string[];
             runtimeMode: string;
             schemaVersion: string;
+            screenshots?: null | string[];
+            supportUrl?: null | string;
             version: string;
         };
         PlatformAppVersionDto: {

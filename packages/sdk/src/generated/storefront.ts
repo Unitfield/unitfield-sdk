@@ -304,6 +304,7 @@ export interface components {
             signInUrl: string;
         };
         StorefrontHostResolution: {
+            accountClientId?: null | string;
             host: string;
             hosts: string[];
             kind: string;
