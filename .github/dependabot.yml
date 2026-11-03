@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # TypeScript 7 breaks svelte-check 4.x in examples/svelte (it needs TS 6 alongside plus --tsgo). Revisit when svelte-check supports TS 7.
+    ignore:
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
   # The starter's own pinned dependencies are not part of the pnpm workspace.
   - package-ecosystem: npm
     directory: /packages/create-unitfield-site/template
