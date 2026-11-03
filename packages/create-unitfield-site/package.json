@@ -1,6 +1,6 @@
 {
   "name": "create-unitfield-site",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scaffold a Next.js site on the Unitfield storefront API: npx create-unitfield-site my-site",
   "license": "MIT",
   "type": "module",
