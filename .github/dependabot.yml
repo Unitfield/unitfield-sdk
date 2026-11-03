@@ -1,21 +1,73 @@
 version: 2
+
+# Monthly and grouped, so the repo gets a few PRs a month instead of one per package.
+# - Minor and patch updates arrive as one production PR and one development PR per manifest, which also
+#   keeps react and react-dom (and their @types) moving together instead of as separate failing PRs.
+#   Majors stay separate and need a human read.
+# - Security updates are grouped separately and are not tied to the monthly schedule.
+# - No target-branch on purpose: main is the default branch and the one CI and releases use,
+#   and GitHub ignores the security-updates groups below for any entry that sets target-branch.
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    # TypeScript 7 breaks svelte-check 4.x in examples/svelte (it needs TS 6 alongside plus --tsgo). Revisit when svelte-check supports TS 7.
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      npm-production:
+        applies-to: version-updates
+        dependency-type: production
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      npm-development:
+        applies-to: version-updates
+        dependency-type: development
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
     ignore:
+      # TypeScript 7 breaks svelte-check 4.x in examples/svelte (it needs TS 6 alongside plus --tsgo). Revisit when svelte-check supports TS 7.
       - dependency-name: typescript
         update-types: ["version-update:semver-major"]
+      # Node is pinned to 24 (.nvmrc and engines), and @types/node has to match it.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
   # The starter's own pinned dependencies are not part of the pnpm workspace.
   - package-ecosystem: npm
     directory: /packages/create-unitfield-site/template
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      template-npm-production:
+        applies-to: version-updates
+        dependency-type: production
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      template-npm-development:
+        applies-to: version-updates
+        dependency-type: development
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      template-npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    ignore:
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: github-actions
     directories:
       - /
-      - /.github/actions/publish-package
+      - /.github/actions/*
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      github-actions:
+        patterns: ["*"]
