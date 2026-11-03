@@ -1149,6 +1149,521 @@
         "x-unitfield-record-scoped": false,
         "x-unitfield-tenant-header-required": false
       }
+    },
+    "/api/storefront/v1/tour-windows": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Get Tour Windows",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_GetTourWindows",
+        "parameters": [
+          {
+            "name": "listingPublicId",
+            "in": "query",
+            "description": "Resource identifier.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourWindowsDto"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified"
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/tours/answer": {
+      "post": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Answer Tour",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_AnswerTour",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TourAnswerRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourVisitorView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/tours/ics": {
+      "get": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront Tour Ics",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_TourIcs",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
+    },
+    "/api/storefront/v1/tours/view": {
+      "post": {
+        "tags": [
+          "Storefront"
+        ],
+        "summary": "Storefront View Tour",
+        "description": "User-scoped/public operation. 'X-Tenant-Id' not required.",
+        "operationId": "Storefront_ViewTour",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TourViewRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourVisitorView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (validation/format errors)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid credentials)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (business rule or concurrency)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (domain validation)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitfieldProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-unitfield-authenticated": false,
+        "x-unitfield-permission-groups": [],
+        "x-unitfield-record-scoped": false,
+        "x-unitfield-tenant-header-required": false
+      }
     }
   },
   "components": {
@@ -1977,6 +2492,21 @@
               "null",
               "string"
             ]
+          },
+          "picks": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/StorefrontTourPick"
+            }
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2116,6 +2646,287 @@
           },
           "isPreview": {
             "type": "boolean"
+          }
+        }
+      },
+      "StorefrontTourPick": {
+        "required": [
+          "date",
+          "window"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "window": {
+            "type": "string"
+          }
+        }
+      },
+      "TourAnswerRequest": {
+        "required": [
+          "token",
+          "action"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "action": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "picks": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/StorefrontTourPick"
+            }
+          },
+          "message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TourOfferDayDto": {
+        "required": [
+          "date",
+          "weekday",
+          "windows"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "weekday": {
+            "type": "string"
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TourViewRequest": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TourVisitorProposal": {
+        "required": [
+          "date",
+          "start",
+          "end",
+          "hostFirstName"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "end": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "hostFirstName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TourVisitorView": {
+        "required": [
+          "status",
+          "orgName",
+          "homeName",
+          "address",
+          "date",
+          "start",
+          "end",
+          "hostFirstName",
+          "proposal",
+          "picks",
+          "canAnswerReminder",
+          "canChange",
+          "canCancel",
+          "offer",
+          "applyUrl",
+          "zoneId",
+          "photoUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "orgName": {
+            "type": "string"
+          },
+          "homeName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "date": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "start": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "end": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "hostFirstName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "proposal": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TourVisitorProposal"
+              }
+            ]
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StorefrontTourPick"
+            }
+          },
+          "canAnswerReminder": {
+            "type": "boolean"
+          },
+          "canChange": {
+            "type": "boolean"
+          },
+          "canCancel": {
+            "type": "boolean"
+          },
+          "offer": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TourWindowsDto"
+              }
+            ]
+          },
+          "applyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TourWindowRangeDto": {
+        "required": [
+          "start",
+          "end"
+        ],
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string"
+          },
+          "end": {
+            "type": "string"
+          }
+        }
+      },
+      "TourWindowsDto": {
+        "required": [
+          "zoneId",
+          "days",
+          "windows",
+          "maxPicks"
+        ],
+        "type": "object",
+        "properties": {
+          "zoneId": {
+            "type": "string"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourOfferDayDto"
+            }
+          },
+          "windows": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TourWindowRangeDto"
+            }
+          },
+          "maxPicks": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },

@@ -163,6 +163,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/storefront/v1/tour-windows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Storefront Get Tour Windows
+         * @description User-scoped/public operation. 'X-Tenant-Id' not required.
+         */
+        get: operations["Storefront_GetTourWindows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/storefront/v1/tours/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Storefront Answer Tour
+         * @description User-scoped/public operation. 'X-Tenant-Id' not required.
+         */
+        post: operations["Storefront_AnswerTour"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/storefront/v1/tours/ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Storefront Tour Ics
+         * @description User-scoped/public operation. 'X-Tenant-Id' not required.
+         */
+        get: operations["Storefront_TourIcs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/storefront/v1/tours/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Storefront View Tour
+         * @description User-scoped/public operation. 'X-Tenant-Id' not required.
+         */
+        post: operations["Storefront_ViewTour"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -330,7 +410,9 @@ export interface components {
             message: null | string;
             name: null | string;
             phone: null | string;
+            picks?: null | components["schemas"]["StorefrontTourPick"][];
             preferredTimes: null | string[];
+            timeZone?: null | string;
             turnstileToken: null | string;
         };
         StorefrontListingsResponse: {
@@ -365,6 +447,62 @@ export interface components {
             status: string;
             themeId: string;
             themeVersion: string;
+        };
+        StorefrontTourPick: {
+            date: string;
+            window: string;
+        };
+        TourAnswerRequest: {
+            action: null | string;
+            message?: null | string;
+            picks?: null | components["schemas"]["StorefrontTourPick"][];
+            token: null | string;
+        };
+        TourOfferDayDto: {
+            date: string;
+            weekday: string;
+            windows: string[];
+        };
+        TourViewRequest: {
+            token: null | string;
+        };
+        TourVisitorProposal: {
+            date: string;
+            end: null | string;
+            hostFirstName: null | string;
+            start: string;
+        };
+        TourVisitorView: {
+            address: null | string;
+            applyUrl: null | string;
+            canAnswerReminder: boolean;
+            canCancel: boolean;
+            canChange: boolean;
+            date: null | string;
+            end: null | string;
+            homeName: null | string;
+            hostFirstName: null | string;
+            offer: null | components["schemas"]["TourWindowsDto"];
+            orgName: string;
+            photoUrl: null | string;
+            picks: components["schemas"]["StorefrontTourPick"][];
+            proposal: null | components["schemas"]["TourVisitorProposal"];
+            start: null | string;
+            status: string;
+            zoneId: string;
+        };
+        TourWindowRangeDto: {
+            end: string;
+            start: string;
+        };
+        TourWindowsDto: {
+            days: components["schemas"]["TourOfferDayDto"][];
+            /** Format: int32 */
+            maxPicks: number | string;
+            windows: {
+                [key: string]: components["schemas"]["TourWindowRangeDto"];
+            };
+            zoneId: string;
         };
         UnitfieldProblemDetails: {
             code: string;
@@ -1231,6 +1369,428 @@ export interface operations {
                 };
             };
             /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Service unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+        };
+    };
+    Storefront_GetTourWindows: {
+        parameters: {
+            query?: {
+                /** @description Resource identifier. */
+                listingPublicId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TourWindowsDto"];
+                };
+            };
+            /** @description Not Modified */
+            304: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request (validation/format errors) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Forbidden (insufficient permissions) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Conflict (business rule or concurrency) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unprocessable entity (domain validation) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldValidationProblemDetails"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Service unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+        };
+    };
+    Storefront_AnswerTour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": null | components["schemas"]["TourAnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TourVisitorView"];
+                };
+            };
+            /** @description Bad request (validation/format errors) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unauthorized (missing/invalid credentials) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Forbidden (insufficient permissions) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Conflict (business rule or concurrency) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldValidationProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Service unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+        };
+    };
+    Storefront_TourIcs: {
+        parameters: {
+            query?: {
+                token?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request (validation/format errors) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unauthorized (missing/invalid credentials) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Forbidden (insufficient permissions) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Conflict (business rule or concurrency) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unprocessable entity (domain validation) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldValidationProblemDetails"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Service unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+        };
+    };
+    Storefront_ViewTour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": null | components["schemas"]["TourViewRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TourVisitorView"];
+                };
+            };
+            /** @description Bad request (validation/format errors) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unauthorized (missing/invalid credentials) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Forbidden (insufficient permissions) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Conflict (business rule or concurrency) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldProblemDetails"];
+                };
+            };
+            /** @description Unprocessable entity (domain validation) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["UnitfieldValidationProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
             429: {
                 headers: {
                     [name: string]: unknown;

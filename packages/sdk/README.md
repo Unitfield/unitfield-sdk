@@ -55,8 +55,11 @@ await storefront.tours.answer({ token, action: "coming" });         // accept_pr
 await storefront.tours.answer({ token, action: "pick", picks });    // new picks, taken from tour.offer
 ```
 
-An unknown, expired or revoked link is one uniform `NotFoundError`. `preferredTimes` (ISO times) still works for
-sites that have not moved to `picks`.
+An unknown, expired or revoked link is one uniform `NotFoundError` (`tours.link_invalid`). `answer` also throws a
+`ConflictError` (`tours.wrong_status`) when the tour changed under the visitor and a `ValidationError`
+(`tours.picks_invalid`) when no pick is on offer. The calendar file (`tours.icsUrl`) exists once a time is booked. The
+visitor calls are limited per visitor address (30 views and 10 answers an hour). `preferredTimes` (ISO times) still works
+for sites that have not moved to `picks`.
 
 ## Sign customers in (OIDC authorization code + PKCE)
 

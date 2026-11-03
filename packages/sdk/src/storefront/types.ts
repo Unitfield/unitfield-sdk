@@ -124,89 +124,58 @@ export type InquiryInput = {
 export type InquiryAccepted = Wire<Schemas["StorefrontInquiryAccepted"]>;
 
 /*
- * Tours (`GET /tour-windows`, `POST /tours/view`, `POST /tours/answer`, `GET /tours/ics`).
- *
- * These shapes are written from the product spec (docs/product/tours.md section 5.3) because the API has not exported them in the
- * storefront OpenAPI snapshot yet. When `pnpm gen:api` brings them in, replace each with `Wire<Schemas["..."]>` of the generated
- * schema, keeping the exported names, and add the tour calls to `storefrontInvocations` in test/contract.test.mts.
+ * Tours (`GET /tour-windows`, `POST /tours/view`, `POST /tours/answer`, `GET /tours/ics`). The shapes are the generated ones; the
+ * document types `status`, the window keys and the answer action as plain strings, so those carry their known values here.
  */
 
 /** A tour window of the organization's day: morning, afternoon or evening. The hours come from `TourWindows.windows`. */
 export type TourWindowKey = "morning" | "afternoon" | "evening";
 
 /** One thing a visitor picked: an organization-local calendar day (`YYYY-MM-DD`) and one of its windows. */
-export type TourPick = {
-  date: string;
+export type TourPick = Omit<Wire<Schemas["StorefrontTourPick"]>, "window"> & {
   window: TourWindowKey;
 };
 
 /** Query for `GET /tour-windows`. Without a listing the offer is the organization's general one. */
-export type TourWindowsQuery = {
-  listingPublicId?: string;
-};
+export type TourWindowsQuery = Wire<NonNullable<operations["Storefront_GetTourWindows"]["parameters"]["query"]>>;
 
 /** One day of the offer. `date` is the organization-local day; `windows` are the ones open that day (closed days are not listed). */
-export type TourOfferDay = {
-  date: string;
-  /** The weekday as the API names it; derive a display label from `date` when you need one. */
-  weekday: string;
+export type TourOfferDay = Omit<Wire<Schemas["TourOfferDayDto"]>, "weekday" | "windows"> & {
+  /** `mon` to `sun`; derive a display label from `date` when you need one. */
+  weekday: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun" | (string & {});
   windows: TourWindowKey[];
 };
 
 /** The hours of a window, `HH:mm` in the organization's time zone. */
-export type TourWindowHours = {
-  start: string;
-  end: string;
-};
+export type TourWindowHours = Wire<Schemas["TourWindowRangeDto"]>;
 
 /**
  * `GET /tour-windows`: what a tour request form may offer. `days` runs from tomorrow, in the organization's calendar and
  * zone, without the closed days and windows; an empty `days` means the site offers no tours (show an email or phone fallback).
+ * `zoneId` is that IANA zone, for example `America/Los_Angeles`.
  */
-export type TourWindows = {
-  /** IANA zone of the organization, for example `America/Los_Angeles`. */
-  zoneId: string;
+export type TourWindows = Omit<Wire<Schemas["TourWindowsDto"]>, "days" | "windows"> & {
   days: TourOfferDay[];
   /** Hours per window; a window that is off everywhere may be missing. */
   windows: Partial<Record<TourWindowKey, TourWindowHours>>;
-  /** How many picks one request may hold (5). */
-  maxPicks: number;
 };
 
-/** The lifecycle of a tour as the visitor sees it. */
+/** The lifecycle of a tour as the visitor sees it. A cancel revokes the link, so `canceled` only ever comes back in the answer to `cancel`: opening the link again is a `NotFoundError`. */
 export type TourStatus = "requested" | "needs_time" | "scheduled" | "toured" | "no_show" | "canceled" | "applied";
 
-/** A time the organization suggested in place of the visitor's picks (`status: "requested"` with a proposal). */
-export type TourProposal = {
-  /** Organization-local day, `YYYY-MM-DD`. */
-  date: string;
-  /** Organization-local start, `HH:mm`. */
-  start: string;
-  end?: string | null;
-  hostFirstName?: string | null;
-};
+/** A time the organization suggested in place of the visitor's picks (`status: "requested"` with a proposal). `date` and `start` are organization-local. */
+export type TourProposal = Wire<Schemas["TourVisitorProposal"]>;
 
 /**
  * `POST /tours/view` and `POST /tours/answer`: the tour behind a visitor's private link. `date`, `start` and `end` describe the
- * booked time in the organization's zone and are null until a time is set. `offer` is present when the visitor may pick times
- * (`canChange`). `applyUrl` appears after the tour.
+ * booked time in the organization's zone (`zoneId`) and are null until a time is booked. `offer` is present when the visitor may pick
+ * times (`canChange`). `applyUrl` appears after the tour. `photoUrl` is the home's cover.
  */
-export type TourVisitorView = {
+export type TourVisitorView = Omit<Wire<Schemas["TourVisitorView"]>, "status" | "picks" | "proposal" | "offer"> & {
   status: TourStatus;
-  orgName: string;
-  homeName: string | null;
-  address: string | null;
-  date: string | null;
-  start: string | null;
-  end: string | null;
-  hostFirstName: string | null;
-  proposal?: TourProposal | null;
   picks: TourPick[];
-  canAnswerReminder: boolean;
-  canChange: boolean;
-  canCancel: boolean;
-  offer?: TourWindows | null;
-  applyUrl?: string | null;
+  proposal: TourProposal | null;
+  offer: TourWindows | null;
 };
 
 /** What a visitor can do on the tour page. `pick` replaces their picks and needs `picks`. */

@@ -34,8 +34,10 @@ on npm names this exact file and the `npm-release` environment; renaming either 
 
 ### Things to keep in step by hand
 
-- **`@unitfield/react` peers `@unitfield/sdk` at `^0.1.3`.** In 0.x that means `>=0.1.3 <0.2.0`. When the SDK moves to `0.2.0`,
-  change the peer range (and the dev dependency) in `packages/react/package.json`, and release both.
+- **`@unitfield/react` peers `@unitfield/sdk` at `^0.1.3 || ^0.2.0`.** A caret range in 0.x covers one minor line only
+  (`^0.1.3` is `>=0.1.3 <0.2.0`), so when the SDK moves to a new minor, add that line to the peer range, point the dev
+  dependency (and the examples) at it, and release React with a new version too: the plan skips a package whose version is
+  already on npm.
 - **The starter pins exact versions.** `packages/create-unitfield-site/template/package.json` pins `@unitfield/sdk` and
   `@unitfield/react`, Next.js and React. After a new SDK or React release is on npm, update the pins in a follow-up commit (a test
   keeps them from naming a version newer than this repository has, and the release job refuses to publish while a pin is not on

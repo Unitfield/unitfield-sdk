@@ -17,7 +17,7 @@ The API root is `https://api.unitfield.com`.
 
 Public reads of your site and homes, and the inquiry endpoint. Send your publishable key in `X-Unitfield-Key`. Requests that carry an `Origin` must come from an origin allowed on the key. SDK: `StorefrontClient`.
 
-Source: `packages/sdk/openapi/storefront.json`. 8 operations.
+Source: `packages/sdk/openapi/storefront.json`. 12 operations.
 
 | Method | Path | Operation | Summary |
 | --- | --- | --- | --- |
@@ -29,6 +29,10 @@ Source: `packages/sdk/openapi/storefront.json`. 8 operations.
 | GET | `/api/storefront/v1/properties` | `Storefront_ListProperties` | Storefront List Properties |
 | GET | `/api/storefront/v1/properties/{propertyPublicId}` | `Storefront_GetProperty` | Storefront Get Property |
 | GET | `/api/storefront/v1/site` | `Storefront_GetSite` | Storefront Get Site |
+| GET | `/api/storefront/v1/tour-windows` | `Storefront_GetTourWindows` | Storefront Get Tour Windows |
+| POST | `/api/storefront/v1/tours/answer` | `Storefront_AnswerTour` | Storefront Answer Tour |
+| GET | `/api/storefront/v1/tours/ics` | `Storefront_TourIcs` | Storefront Tour Ics |
+| POST | `/api/storefront/v1/tours/view` | `Storefront_ViewTour` | Storefront View Tour |
 
 ## Customer API
 
@@ -198,4 +202,4 @@ Source: `packages/sdk/openapi/customer-auth.json`. 13 operations.
 | POST | `/api/customer-auth/v1/sessions/revoke-all` | `CustomerAuth_RevokeAllSessions` | Customer Auth Revoke All Sessions |
 | POST | `/api/customer-auth/v1/step-up/verify` | `CustomerAuth_VerifyStepUp` | Customer Auth Verify Step Up |
 
-131 operations in 6 documents.
+135 operations in 6 documents.

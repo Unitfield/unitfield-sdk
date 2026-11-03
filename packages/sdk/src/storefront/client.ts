@@ -287,7 +287,10 @@ class StorefrontTours {
 
   /**
    * One thing the visitor does on the tour page (`POST /tours/answer`): accept a proposed time, say they are coming or cannot make
-   * it, cancel, or pick new times. Resolves with the tour as it is afterwards. Same errors as `view`.
+   * it, cancel, or pick new times. Resolves with the tour as it is afterwards (after `cancel`, with status `canceled`: the link is
+   * revoked from then on). Same errors as `view`, and two more: a `ConflictError` (`tours.wrong_status`) when the tour is no longer
+   * in a state that allows the action, and a `ValidationError` (`tours.picks_invalid`) when no pick is on offer. `pick` is accepted
+   * while the view's `canChange` is true; on a booked tour it releases the booking and goes back to `requested`.
    */
   async answer(input: TourAnswerInput, options: MutationOptions = {}): Promise<TourVisitorView> {
     const token = tourToken(input?.token);
@@ -316,7 +319,7 @@ class StorefrontTours {
   /**
    * The address of the `.ics` calendar file for the tour's current state (`GET /tours/ics?token=…`, `text/calendar`). This only
    * builds the URL: the call needs the same credentials as every storefront route, so fetch it on your server and serve the
-   * file to the visitor.
+   * file to the visitor. There is a file once a time is booked; before that, and for a canceled tour, the answer is a 404.
    */
   icsUrl(token: string): string {
     return resolveApiUrl(new URL(this.#baseUrl), `${BASE}/tours/ics`, { token: tourToken(token) }).toString();
@@ -324,7 +327,7 @@ class StorefrontTours {
 }
 
 /** The request body as the API declares it: every field is optional-nullable on the wire, `preferredTimes` are ISO strings. */
-function inquiryBody(input: InquiryInput): Partial<components["schemas"]["StorefrontInquiryRequest"]> & Pick<InquiryInput, "picks" | "timeZone"> {
+function inquiryBody(input: InquiryInput): Partial<components["schemas"]["StorefrontInquiryRequest"]> {
   if (input.kind !== "contact" && input.kind !== "tour") throw new TypeError('kind must be "contact" or "tour".');
   for (const field of ["name", "email", "turnstileToken"] as const) {
     if (typeof input[field] !== "string" || !input[field].trim()) throw new TypeError(`${field} must be a non-empty string.`);

@@ -18,10 +18,13 @@ const org = "e7a9d8c0-11c4-49b6-a1c2-559ed024db36";
 const installation = "app_0123456789abcdef0123456789abcdef";
 const body = { items: [], page: 1, pageSize: 20, total: 0, nextCursor: null };
 
-type Schema = { $ref?: string; properties?: Record<string, unknown>; required?: string[]; additionalProperties?: unknown; allOf?: Schema[] };
+type Schema = { $ref?: string; type?: string; properties?: Record<string, unknown>; required?: string[]; additionalProperties?: unknown; allOf?: Schema[]; oneOf?: Schema[] };
 
 function resolve(doc: Document, schema: Schema | undefined): Schema | undefined {
   if (schema?.$ref) return resolve(doc, (doc.components?.schemas as Record<string, Schema>)[schema.$ref.split("/").pop()!]);
+  // An optional body is documented as `oneOf: [null, Body]`: the body is the one alternative that is not null.
+  const alternatives = schema?.oneOf?.filter((alternative) => alternative.type !== "null");
+  if (alternatives?.length === 1) return resolve(doc, alternatives[0]);
   return schema;
 }
 
@@ -219,7 +222,11 @@ function storefrontInvocations(fetch: typeof globalThis.fetch) {
     "listings.get": () => c.listings.get("clst_1"),
     "properties.list": () => c.properties.list({ cursor: "c", limit: 10 }),
     "properties.get": () => c.properties.get("cprop_1"),
-    "inquiries.create": () => c.inquiries.create({ kind: "tour", name: "Ada", email: "a@b.test", phone: "1", message: "m", listingPublicId: "clst_1", preferredTimes: ["2026-09-01T10:00:00Z"], turnstileToken: "t" }),
+    "inquiries.create": () =>
+      c.inquiries.create({ kind: "tour", name: "Ada", email: "a@b.test", phone: "1", message: "m", listingPublicId: "clst_1", picks: [{ date: "2026-09-01", window: "morning" }], timeZone: "Europe/Istanbul", preferredTimes: ["2026-09-01T10:00:00Z"], turnstileToken: "t" }),
+    "tours.windows": () => c.tours.windows({ listingPublicId: "clst_1" }),
+    "tours.view": () => c.tours.view("tok_abcdefgh"),
+    "tours.answer": () => c.tours.answer({ token: "tok_abcdefgh", action: "pick", picks: [{ date: "2026-11-04", window: "morning" }], message: "m" }),
   };
 }
 
@@ -246,7 +253,8 @@ function applicantInvocations(fetch: typeof globalThis.fetch) {
 }
 
 test("the storefront client matches the storefront contract operation for operation", async () => {
-  await verifyAgainst(snapshot("storefront")!, [], storefrontInvocations);
+  // `tours.icsUrl` only builds the address of the calendar file (it needs the storefront credentials, so a server fetches it): no call to check.
+  await verifyAgainst(snapshot("storefront")!, ["GET /api/storefront/v1/tours/ics"], storefrontInvocations);
 });
 
 test("the applicant client matches the customer applications contract operation for operation", async () => {
