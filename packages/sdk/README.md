@@ -29,10 +29,34 @@ await storefront.inquiries.create({ kind: "contact", name, email, message, turns
 ```
 
 Methods: `hosts.resolve`, `site.get`, `pages.get`, `listings.list|iterate|get`,
-`properties.list|iterate|get`, `inquiries.create`. `listings.list` also filters by
+`properties.list|iterate|get`, `inquiries.create`, `tours.windows|view|answer|icsUrl`. `listings.list` also filters by
 `unitPublicKey` (the key in `/apply/{unitPublicKey}`). A preview token
 (`storefront.withPreview(token)`) reads the draft and bypasses caches. Public reads
 set no `cache` mode so the HTTP cache (or a framework's, via `fetchOptions`) applies.
+
+## Tours
+
+A tour request is a set of day-and-window picks (morning, afternoon, evening) from the organization's own calendar.
+`tours.windows` says which days and windows the organization offers; `inquiries.create` sends the picks, with the
+visitor's time zone. After that the visitor manages the tour from a private link that only goes out by email:
+`tours.view` and `tours.answer` back that page, and `tours.icsUrl` is the address of its calendar file.
+
+```ts
+const offer = await storefront.tours.windows({ listingPublicId }); // days: [] means tours are off; a NotFoundError means an older API
+await storefront.inquiries.create({
+  kind: "tour", name, email, listingPublicId, turnstileToken,
+  picks: [{ date: offer.days[0].date, window: offer.days[0].windows[0] }],
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+});
+
+// On the tour page behind the emailed link (the token is a credential: serve the page with `Cache-Control: no-store`).
+const tour = await storefront.tours.view(token);                    // status, time, home, what the visitor may do
+await storefront.tours.answer({ token, action: "coming" });         // accept_proposal | coming | cant_make_it | cancel | pick
+await storefront.tours.answer({ token, action: "pick", picks });    // new picks, taken from tour.offer
+```
+
+An unknown, expired or revoked link is one uniform `NotFoundError`. `preferredTimes` (ISO times) still works for
+sites that have not moved to `picks`.
 
 ## Sign customers in (OIDC authorization code + PKCE)
 

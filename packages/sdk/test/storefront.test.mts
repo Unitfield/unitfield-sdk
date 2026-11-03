@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { AuthenticationError, RateLimitError, UnitfieldError, createStorefrontClient } from "../dist/index.js";
+import { AuthenticationError, NotFoundError, RateLimitError, UnitfieldError, createStorefrontClient } from "../dist/index.js";
 import { instantRetry, problem, recorder } from "./helpers.mts";
 
 const baseUrl = "https://api.unitfield.test";
@@ -230,4 +230,121 @@ test("a revoked key or a wrong origin is an AuthenticationError", async () => {
   const { fetch } = recorder(() => problem(401, { code: "Storefront.KeyRejected", detail: "Origin not allowed." }));
   const client = createStorefrontClient({ baseUrl, publishableKey, fetch, retry: false });
   await assert.rejects(client.site.get(), (error: unknown) => error instanceof AuthenticationError && error.code === "Storefront.KeyRejected");
+});
+
+const picks = [
+  { date: "2026-11-04", window: "afternoon" as const },
+  { date: "2026-11-05", window: "morning" as const },
+];
+
+test("a tour request sends picks and the visitor's time zone, and still accepts the legacy times", async () => {
+  const { calls, fetch } = recorder(() => Response.json({ status: "accepted" }, { status: 202 }));
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch });
+  await client.inquiries.create({ kind: "tour", name: "Ada", email: "ada@example.test", listingPublicId: "clst_abc", picks, timeZone: " America/Phoenix ", preferredTimes: ["2026-11-04T21:00:00Z"], turnstileToken: "t" });
+  assert.deepEqual(calls[0].body, {
+    kind: "tour", name: "Ada", email: "ada@example.test", listingPublicId: "clst_abc",
+    picks, timeZone: "America/Phoenix", preferredTimes: ["2026-11-04T21:00:00.000Z"], turnstileToken: "t",
+  });
+  await client.inquiries.create({ kind: "tour", name: "Ada", email: "ada@example.test", preferredTimes: ["2026-11-04T21:00:00Z"], turnstileToken: "t" });
+  assert.equal("picks" in (calls[1].body as object), false, "a legacy request carries no picks");
+  assert.equal("timeZone" in (calls[1].body as object), false);
+});
+
+test("tour picks are validated before anything is sent", async () => {
+  const { calls, fetch } = recorder();
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch });
+  const valid = { kind: "tour" as const, name: "Ada", email: "ada@example.test", turnstileToken: "t" };
+  await assert.rejects(client.inquiries.create({ ...valid, picks: [] }), /picks/);
+  await assert.rejects(client.inquiries.create({ ...valid, picks: Array.from({ length: 6 }, () => picks[0]) }), /picks/);
+  await assert.rejects(client.inquiries.create({ ...valid, picks: [{ date: "11/04/2026", window: "morning" }] }), /YYYY-MM-DD/);
+  await assert.rejects(client.inquiries.create({ ...valid, picks: [{ date: "2026-13-45", window: "morning" }] }), /YYYY-MM-DD/);
+  await assert.rejects(client.inquiries.create({ ...valid, picks: [{ date: "2026-11-04", window: "night" as never }] }), /window/);
+  await assert.rejects(client.inquiries.create({ ...valid, picks, timeZone: " " }), /timeZone/);
+  await assert.rejects(client.inquiries.create({ ...valid, picks, timeZone: "x".repeat(65) }), /timeZone/);
+  assert.equal(calls.length, 0);
+});
+
+const offer = {
+  zoneId: "America/Los_Angeles",
+  days: [{ date: "2026-11-04", weekday: "wed", windows: ["morning", "afternoon"] }],
+  windows: { morning: { start: "09:00", end: "12:00" }, afternoon: { start: "12:00", end: "17:00" } },
+  maxPicks: 5,
+};
+
+test("tours.windows reads the offer with the key, scoped to a listing, and stays cacheable", async () => {
+  const { calls, fetch } = recorder(() => Response.json(offer));
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch, fetchOptions: { next: { revalidate: 60 } } });
+  assert.deepEqual(await client.tours.windows({ listingPublicId: "clst_abc" }), offer);
+  await client.tours.windows();
+  await client.tours.windows({ listingPublicId: " " });
+  assert.equal(calls[0].method, "GET");
+  assert.equal(calls[0].url.pathname, "/api/storefront/v1/tour-windows");
+  assert.equal(calls[0].url.search, "?listingPublicId=clst_abc");
+  assert.equal(calls[1].url.search, "");
+  assert.equal(calls[2].url.search, "", "a blank listing id is not sent");
+  assert.equal(calls[0].headers.get("x-unitfield-key"), publishableKey);
+  assert.equal(calls[0].init.cache, undefined, "public reads must be left to the HTTP cache");
+  assert.deepEqual((calls[0].init as { next?: unknown }).next, { revalidate: 60 });
+});
+
+test("a 404 from tours.windows is a NotFoundError, so a caller can fall back on an API without tours", async () => {
+  const { fetch } = recorder(() => problem(404, { code: "storefront.not_found" }));
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch, retry: false });
+  await assert.rejects(client.tours.windows(), NotFoundError);
+});
+
+const view = { status: "scheduled", orgName: "Alderwood Rentals", homeName: "Juniper Heights 104", address: "3045 Juniper St", date: "2026-11-04", start: "14:30", end: "15:00", hostFirstName: "James", picks: [], canAnswerReminder: false, canChange: true, canCancel: true };
+
+test("tours.view posts the token, never caches the private answer and is not retried", async () => {
+  const { retry } = instantRetry();
+  const { calls, fetch } = recorder(() => Response.json(view));
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch, retry, fetchOptions: { next: { revalidate: 60 } } });
+  assert.deepEqual(await client.tours.view("  tok_ABC-123_xyz  "), view);
+  assert.equal(calls[0].method, "POST");
+  assert.equal(calls[0].url.pathname, "/api/storefront/v1/tours/view");
+  assert.deepEqual(calls[0].body, { token: "tok_ABC-123_xyz" });
+  assert.equal(calls[0].headers.get("x-unitfield-key"), publishableKey);
+  assert.equal(calls[0].init.cache, "no-store", "a token answer is private, whatever the client's defaults are");
+  for (const bad of ["", "  ", "a b", undefined, 42]) await assert.rejects(client.tours.view(bad as never), /token/, String(bad));
+  assert.equal(calls.length, 1);
+
+  const failing = recorder(() => problem(503, { code: "unavailable" }));
+  await assert.rejects(createStorefrontClient({ baseUrl, publishableKey, fetch: failing.fetch, retry }).tours.view("tok"));
+  assert.equal(failing.calls.length, 1, "a POST without an idempotency key is never retried");
+});
+
+test("an unknown tour link is one uniform NotFoundError, and the view rate limit is typed", async () => {
+  const gone = createStorefrontClient({ baseUrl, publishableKey, fetch: recorder(() => problem(404, { code: "tours.link_invalid" })).fetch, retry: false });
+  await assert.rejects(gone.tours.view("tok"), (error: unknown) => error instanceof NotFoundError && error.code === "tours.link_invalid");
+  await assert.rejects(gone.tours.answer({ token: "tok", action: "coming" }), NotFoundError);
+  const limited = createStorefrontClient({ baseUrl, publishableKey, fetch: recorder(() => problem(429, { code: "RateLimited" }, { "retry-after": "600" })).fetch, retry: false });
+  await assert.rejects(limited.tours.view("tok"), (error: unknown) => error instanceof RateLimitError && error.retryAfterSeconds === 600);
+});
+
+test("tours.answer posts one action; picks go with pick only", async () => {
+  const { calls, fetch } = recorder(() => Response.json(view));
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch });
+  for (const action of ["accept_proposal", "coming", "cant_make_it", "cancel"] as const) await client.tours.answer({ token: "tok", action });
+  await client.tours.answer({ token: "tok", action: "pick", picks, message: " Evenings are best " }, { idempotencyKey: "once" });
+  assert.deepEqual(calls.map((call) => (call.body as { action: string }).action), ["accept_proposal", "coming", "cant_make_it", "cancel", "pick"]);
+  assert.equal(calls[0].url.pathname, "/api/storefront/v1/tours/answer");
+  assert.deepEqual(calls[0].body, { token: "tok", action: "accept_proposal" });
+  assert.deepEqual(calls[4].body, { token: "tok", action: "pick", picks, message: "Evenings are best" });
+  assert.equal(calls[4].headers.get("Idempotency-Key"), "once");
+  for (const call of calls) assert.equal(call.init.cache, "no-store");
+
+  const before = calls.length;
+  await assert.rejects(client.tours.answer({ token: "tok", action: "dance" as never }), /action/);
+  await assert.rejects(client.tours.answer({ token: "tok", action: "pick" }), /picks are required/);
+  await assert.rejects(client.tours.answer({ token: "tok", action: "pick", picks: [] }), /picks/);
+  await assert.rejects(client.tours.answer({ token: "tok", action: "cancel", picks }), /only accepted/);
+  await assert.rejects(client.tours.answer({ token: "", action: "cancel" }), /token/);
+  assert.equal(calls.length, before, "nothing is sent for invalid input");
+});
+
+test("tours.icsUrl builds the calendar address on the API origin, encoded", () => {
+  const client = createStorefrontClient({ baseUrl: "https://api.unitfield.test/gateway", publishableKey });
+  assert.equal(client.tours.icsUrl("tok_ABC-123"), "https://api.unitfield.test/gateway/api/storefront/v1/tours/ics?token=tok_ABC-123");
+  assert.equal(client.tours.icsUrl("a+b/c="), "https://api.unitfield.test/gateway/api/storefront/v1/tours/ics?token=a%2Bb%2Fc%3D");
+  assert.throws(() => client.tours.icsUrl(" "), /token/);
 });

@@ -1,7 +1,7 @@
 import { ApiClient, UNITFIELD_API_URL, type ClientOptions } from "../client.js";
 import type { components } from "../generated/storefront.js";
 import { paginateCursor, type IterateOptions, type PagedList } from "../pagination.js";
-import { pathSegment } from "../internal/url.js";
+import { pathSegment, resolveApiUrl } from "../internal/url.js";
 import { Transport, type MutationOptions, type RequestOptions } from "../transport.js";
 import type {
   HostResolution,
@@ -17,6 +17,12 @@ import type {
   PropertyQuery,
   StorefrontPage,
   StorefrontSite,
+  TourAnswerAction,
+  TourAnswerInput,
+  TourPick,
+  TourVisitorView,
+  TourWindows,
+  TourWindowsQuery,
 } from "./types.js";
 
 const BASE = "/api/storefront/v1";
@@ -54,6 +60,7 @@ export class StorefrontClient extends ApiClient {
   readonly listings: StorefrontListings;
   readonly properties: StorefrontProperties;
   readonly inquiries: StorefrontInquiries;
+  readonly tours: StorefrontTours;
   readonly #options: StorefrontClientOptions;
 
   constructor(options: StorefrontClientOptions) {
@@ -75,6 +82,7 @@ export class StorefrontClient extends ApiClient {
     this.listings = new StorefrontListings(this.http);
     this.properties = new StorefrontProperties(this.http);
     this.inquiries = new StorefrontInquiries(this.http);
+    this.tours = new StorefrontTours(this.http, this.baseUrl);
   }
 
   /** A client of the same site whose `site` and `pages` reads return the draft behind `previewToken`. */
@@ -225,17 +233,113 @@ class StorefrontInquiries {
   }
 }
 
+const MAX_PICKS = 5;
+const WINDOW_KEYS = new Set(["morning", "afternoon", "evening"]);
+const ANSWER_ACTIONS = new Set<TourAnswerAction>(["accept_proposal", "coming", "cant_make_it", "cancel", "pick"]);
+const PICK_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** One to five picks, each an organization-local `YYYY-MM-DD` day and a window key. */
+function validatePicks(picks: readonly TourPick[], name: string): void {
+  if (!Array.isArray(picks) || picks.length === 0 || picks.length > MAX_PICKS) throw new TypeError(`${name} must hold 1 to ${MAX_PICKS} picks.`);
+  for (const pick of picks) {
+    if (!pick || typeof pick.date !== "string" || !PICK_DATE.test(pick.date) || Number.isNaN(Date.parse(`${pick.date}T12:00:00Z`))) {
+      throw new TypeError(`${name} dates must be YYYY-MM-DD.`);
+    }
+    if (!WINDOW_KEYS.has(pick.window)) throw new TypeError(`${name} windows must be "morning", "afternoon" or "evening".`);
+  }
+}
+
+function tourToken(token: unknown): string {
+  if (typeof token !== "string" || !token.trim() || /\s/.test(token.trim())) throw new TypeError("token must be the tour link's token.");
+  return token.trim();
+}
+
+class StorefrontTours {
+  readonly #http: Transport;
+  readonly #baseUrl: string;
+  constructor(http: Transport, baseUrl: string) {
+    this.#http = http;
+    this.#baseUrl = baseUrl;
+  }
+
+  /**
+   * What a tour request may offer (`GET /tour-windows`): the organization's open days and windows, from tomorrow, in its own
+   * calendar. An empty `days` means tours are off. A `NotFoundError` means the API predates tours: fall back to your own days.
+   * Cacheable like every public read.
+   */
+  async windows(query: TourWindowsQuery = {}, options: RequestOptions = {}): Promise<TourWindows> {
+    return this.#http.request<TourWindows>({ ...options, path: `${BASE}/tour-windows`, query: { listingPublicId: query.listingPublicId?.trim() || undefined } });
+  }
+
+  /**
+   * The tour behind a visitor's private link (`POST /tours/view`). An unknown, expired or revoked token is one uniform
+   * `NotFoundError` (`tours.link_invalid`). Never cached, never retried; rate limited per visitor address.
+   */
+  async view(token: string, options: RequestOptions = {}): Promise<TourVisitorView> {
+    return this.#http.request<TourVisitorView>({
+      ...options,
+      method: "POST",
+      path: `${BASE}/tours/view`,
+      body: { token: tourToken(token) },
+      fetchOptions: { ...options.fetchOptions, cache: "no-store" },
+    });
+  }
+
+  /**
+   * One thing the visitor does on the tour page (`POST /tours/answer`): accept a proposed time, say they are coming or cannot make
+   * it, cancel, or pick new times. Resolves with the tour as it is afterwards. Same errors as `view`.
+   */
+  async answer(input: TourAnswerInput, options: MutationOptions = {}): Promise<TourVisitorView> {
+    const token = tourToken(input?.token);
+    if (!ANSWER_ACTIONS.has(input.action)) throw new TypeError("action must be accept_proposal, coming, cant_make_it, cancel or pick.");
+    if (input.action === "pick") {
+      if (input.picks === undefined) throw new TypeError('picks are required with action "pick".');
+      validatePicks(input.picks, "picks");
+    } else if (input.picks !== undefined) {
+      throw new TypeError('picks are only accepted with action "pick".');
+    }
+    if (input.message !== undefined && typeof input.message !== "string") throw new TypeError("message must be a string.");
+    return this.#http.request<TourVisitorView>({
+      ...options,
+      method: "POST",
+      path: `${BASE}/tours/answer`,
+      body: {
+        token,
+        action: input.action,
+        ...(input.picks ? { picks: input.picks.map(({ date, window }) => ({ date, window })) } : {}),
+        ...(input.message?.trim() ? { message: input.message.trim() } : {}),
+      },
+      fetchOptions: { ...options.fetchOptions, cache: "no-store" },
+    });
+  }
+
+  /**
+   * The address of the `.ics` calendar file for the tour's current state (`GET /tours/ics?token=…`, `text/calendar`). This only
+   * builds the URL: the call needs the same credentials as every storefront route, so fetch it on your server and serve the
+   * file to the visitor.
+   */
+  icsUrl(token: string): string {
+    return resolveApiUrl(new URL(this.#baseUrl), `${BASE}/tours/ics`, { token: tourToken(token) }).toString();
+  }
+}
+
 /** The request body as the API declares it: every field is optional-nullable on the wire, `preferredTimes` are ISO strings. */
-function inquiryBody(input: InquiryInput): Partial<components["schemas"]["StorefrontInquiryRequest"]> {
+function inquiryBody(input: InquiryInput): Partial<components["schemas"]["StorefrontInquiryRequest"]> & Pick<InquiryInput, "picks" | "timeZone"> {
   if (input.kind !== "contact" && input.kind !== "tour") throw new TypeError('kind must be "contact" or "tour".');
   for (const field of ["name", "email", "turnstileToken"] as const) {
     if (typeof input[field] !== "string" || !input[field].trim()) throw new TypeError(`${field} must be a non-empty string.`);
   }
   if (!/^[^\s@]+@[^\s@]+$/.test(input.email.trim())) throw new TypeError("email must be an email address.");
-  const { preferredTimes, ...rest } = input;
+  const { preferredTimes, picks, timeZone, ...rest } = input;
   if (preferredTimes && preferredTimes.length > 5) throw new TypeError("preferredTimes accepts at most 5 times.");
+  if (picks !== undefined) validatePicks(picks, "picks");
+  if (timeZone !== undefined && (typeof timeZone !== "string" || !timeZone.trim() || timeZone.length > 64)) {
+    throw new TypeError("timeZone must be an IANA time zone name of at most 64 characters.");
+  }
   return {
     ...rest,
+    ...(picks ? { picks: picks.map(({ date, window }) => ({ date, window })) } : {}),
+    ...(timeZone ? { timeZone: timeZone.trim() } : {}),
     ...(preferredTimes
       ? {
           preferredTimes: preferredTimes.map((time) => {

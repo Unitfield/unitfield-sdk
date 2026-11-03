@@ -104,7 +104,17 @@ export type InquiryInput = {
   phone?: string;
   message?: string;
   listingPublicId?: string;
-  /** Tour requests: up to five times, as ISO timestamps (or `Date`s). */
+  /**
+   * Tour requests: up to five day-and-window picks from `tours.windows`. The days are the organization's
+   * own calendar days, so there is no time zone to get wrong. Prefer this over `preferredTimes`.
+   */
+  picks?: TourPick[];
+  /** Tour requests: the visitor's IANA time zone (`Intl.DateTimeFormat().resolvedOptions().timeZone`), so emails can show both times. */
+  timeZone?: string;
+  /**
+   * Tour requests, legacy: up to five times, as ISO timestamps (or `Date`s). The API maps each to the organization's window that
+   * contains that local time. Kept for sites that have not moved to `picks`.
+   */
   preferredTimes?: (string | Date)[];
   /** Cloudflare Turnstile token from the widget; verified server-side. */
   turnstileToken: string;
@@ -112,3 +122,102 @@ export type InquiryInput = {
 
 /** The `202` answer. It is the same for every email, whether or not the Turnstile check passed. */
 export type InquiryAccepted = Wire<Schemas["StorefrontInquiryAccepted"]>;
+
+/*
+ * Tours (`GET /tour-windows`, `POST /tours/view`, `POST /tours/answer`, `GET /tours/ics`).
+ *
+ * These shapes are written from the product spec (docs/product/tours.md section 5.3) because the API has not exported them in the
+ * storefront OpenAPI snapshot yet. When `pnpm gen:api` brings them in, replace each with `Wire<Schemas["..."]>` of the generated
+ * schema, keeping the exported names, and add the tour calls to `storefrontInvocations` in test/contract.test.mts.
+ */
+
+/** A tour window of the organization's day: morning, afternoon or evening. The hours come from `TourWindows.windows`. */
+export type TourWindowKey = "morning" | "afternoon" | "evening";
+
+/** One thing a visitor picked: an organization-local calendar day (`YYYY-MM-DD`) and one of its windows. */
+export type TourPick = {
+  date: string;
+  window: TourWindowKey;
+};
+
+/** Query for `GET /tour-windows`. Without a listing the offer is the organization's general one. */
+export type TourWindowsQuery = {
+  listingPublicId?: string;
+};
+
+/** One day of the offer. `date` is the organization-local day; `windows` are the ones open that day (closed days are not listed). */
+export type TourOfferDay = {
+  date: string;
+  /** The weekday as the API names it; derive a display label from `date` when you need one. */
+  weekday: string;
+  windows: TourWindowKey[];
+};
+
+/** The hours of a window, `HH:mm` in the organization's time zone. */
+export type TourWindowHours = {
+  start: string;
+  end: string;
+};
+
+/**
+ * `GET /tour-windows`: what a tour request form may offer. `days` runs from tomorrow, in the organization's calendar and
+ * zone, without the closed days and windows; an empty `days` means the site offers no tours (show an email or phone fallback).
+ */
+export type TourWindows = {
+  /** IANA zone of the organization, for example `America/Los_Angeles`. */
+  zoneId: string;
+  days: TourOfferDay[];
+  /** Hours per window; a window that is off everywhere may be missing. */
+  windows: Partial<Record<TourWindowKey, TourWindowHours>>;
+  /** How many picks one request may hold (5). */
+  maxPicks: number;
+};
+
+/** The lifecycle of a tour as the visitor sees it. */
+export type TourStatus = "requested" | "needs_time" | "scheduled" | "toured" | "no_show" | "canceled" | "applied";
+
+/** A time the organization suggested in place of the visitor's picks (`status: "requested"` with a proposal). */
+export type TourProposal = {
+  /** Organization-local day, `YYYY-MM-DD`. */
+  date: string;
+  /** Organization-local start, `HH:mm`. */
+  start: string;
+  end?: string | null;
+  hostFirstName?: string | null;
+};
+
+/**
+ * `POST /tours/view` and `POST /tours/answer`: the tour behind a visitor's private link. `date`, `start` and `end` describe the
+ * booked time in the organization's zone and are null until a time is set. `offer` is present when the visitor may pick times
+ * (`canChange`). `applyUrl` appears after the tour.
+ */
+export type TourVisitorView = {
+  status: TourStatus;
+  orgName: string;
+  homeName: string | null;
+  address: string | null;
+  date: string | null;
+  start: string | null;
+  end: string | null;
+  hostFirstName: string | null;
+  proposal?: TourProposal | null;
+  picks: TourPick[];
+  canAnswerReminder: boolean;
+  canChange: boolean;
+  canCancel: boolean;
+  offer?: TourWindows | null;
+  applyUrl?: string | null;
+};
+
+/** What a visitor can do on the tour page. `pick` replaces their picks and needs `picks`. */
+export type TourAnswerAction = "accept_proposal" | "coming" | "cant_make_it" | "cancel" | "pick";
+
+/** Body of `POST /tours/answer`. */
+export type TourAnswerInput = {
+  /** The private token from the tour link. */
+  token: string;
+  action: TourAnswerAction;
+  /** Only with `action: "pick"`: one to five picks, taken from the view's `offer`. */
+  picks?: TourPick[];
+  message?: string;
+};
