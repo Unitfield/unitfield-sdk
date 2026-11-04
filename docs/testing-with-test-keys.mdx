@@ -21,7 +21,7 @@ There is no fake data, no fake applicant and no test mode for the hosted apply p
 
 1. Create a **Test** key.
 2. Add `http://localhost` (without a port) under its allowed origins. One entry covers every port on your machine. If you add
-   `http://localhost:3000`, only that port works.
+   `http://localhost:3000`, only that port works. The same entry lets the inquiry form's Turnstile widget run on your machine.
 3. For sign-in, add `http://localhost:3000/auth/callback` (the exact URL of your callback) under redirect URIs. Redirect URIs
    are exact: wildcards are refused.
 4. Put the key in `.env.local` and run your app.
@@ -42,7 +42,8 @@ Server-side reads (a Server Component, a script) need no allowed origin at all: 
 | --- | --- |
 | `401` from the browser, a server read works | The page's origin is not on the key. |
 | `401` everywhere | The key is revoked, mistyped, or from another site. |
-| An inquiry answers `202` but never arrives | The Turnstile token was rejected. The API answers the same either way. |
+| An inquiry answers `202` but never arrives | The Turnstile token was rejected. The API answers the same either way. Use the site key from `site.turnstileSiteKey`: a token from another widget never passes. |
+| The Turnstile widget shows an error on your site | The origin is not allowed on the key, or the key was changed a moment ago. The widget follows the key's origins. |
 | Sign-in ends on an error page at the issuer | The redirect URI is not an exact match for the one registered, or the key has no redirect URI. |
 | `RateLimitError` | 600 reads per minute per key and address, 5 inquiries per hour per key and address. |
 

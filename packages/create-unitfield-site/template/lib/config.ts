@@ -28,6 +28,7 @@ export function authConfig(): AuthConfig | null {
   return { clientId, sessionSecret, issuer: process.env.UNITFIELD_ID_URL?.trim() || undefined };
 }
 
+/** Only a stand-in for an API that sends no `site.turnstileSiteKey`: a key from another widget is rejected by an API that does. See `lib/inquiry.ts`. */
 export function turnstileSiteKey(): string | null {
   return process.env.TURNSTILE_SITE_KEY?.trim() || null;
 }

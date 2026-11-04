@@ -27,6 +27,8 @@ const KEY = "pk_test_SmokeTestKey0123456789";
 const CLIENT_ID = "cust_sdk_smoke";
 const SESSION_SECRET = "smoke-test-session-secret-0123456789-abcdef";
 const WEBHOOK_SECRET = "whsec_smoke_secret";
+// Cloudflare's published always-passes test site key. The mock API serves it as the site's own Turnstile site key (`site.turnstileSiteKey`).
+const TURNSTILE_SITE_KEY = "1x00000000000000000000AA";
 
 let failures = 0;
 function check(condition, label, detail) {
@@ -158,7 +160,7 @@ function startMock() {
         brand: { name: "Maple Rentals", slug: "maple", logoUrl: null, primaryColor: "#2e6b4e", themeMode: "auto", brandHeaderBackground: false },
         contact: { email: "hello@maple.example.test", phone: "+1 (555) 010-0100" },
         hostedUrls: { applyBaseUrl: "https://homes.example.test/apply", signInUrl: "https://homes.example.test/sign-in", accountUrl: "https://homes.example.test/account" },
-        primaryHost: "homes.example.test", isPreview: false,
+        primaryHost: "homes.example.test", isPreview: false, turnstileSiteKey: TURNSTILE_SITE_KEY,
       }, cache);
     }
     if (path === "/listings") {
@@ -267,8 +269,7 @@ async function main() {
         UNITFIELD_SESSION_SECRET: SESSION_SECRET,
         UNITFIELD_ID_URL: mock.state.origin,
         UNITFIELD_WEBHOOK_SECRET: WEBHOOK_SECRET,
-        // Cloudflare's published always-passes test site key: the page renders the widget container.
-        TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
+        // No TURNSTILE_SITE_KEY: the form takes its widget's site key from the API, in a production build too.
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -316,13 +317,16 @@ async function main() {
     check(response.status === 200 && html.includes("A bright corner home"), "a listing page renders");
     check(html.includes("Apply for this home") && html.includes("Laundry in unit"), "detail has Apply and amenities");
     check(html.includes("Request a tour") && html.includes('type="email"'), "the inquiry form is there");
+    check(html.includes(TURNSTILE_SITE_KEY), "the form's Turnstile widget uses the site key the API sent, with no environment variable");
     response = await get("/listings/clst_smoke_2");
     html = await text(response);
     check(html.includes("not taking applications"), "a closed listing says so instead of linking");
     response = await get("/listings/does-not-exist");
     check(response.status === 404, "an unknown listing is a 404", response.status);
     response = await get("/contact");
-    check(response.status === 200 && (await text(response)).includes("hello@maple.example.test"), "the contact page shows the contact email");
+    html = await text(response);
+    check(response.status === 200 && html.includes("hello@maple.example.test"), "the contact page shows the contact email");
+    check(html.includes('type="email"') && html.includes(TURNSTILE_SITE_KEY), "the contact page shows the inquiry form with the API's Turnstile site key");
 
     step("API reads are cached, and a verified webhook drops them");
     const url = "/listings?city=Cached";

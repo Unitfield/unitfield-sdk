@@ -2646,6 +2646,12 @@
           },
           "isPreview": {
             "type": "boolean"
+          },
+          "turnstileSiteKey": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

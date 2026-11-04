@@ -1,8 +1,8 @@
 import { ApplyButton, ListingAvailability, ListingFacts, ListingImage, ListingLocation, ListingPrice } from "@unitfield/react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { InquiryForm, type InquiryMode } from "@/components/inquiry-form";
-import { turnstileSiteKey } from "@/lib/config";
+import { InquiryForm } from "@/components/inquiry-form";
+import { inquiryMode } from "@/lib/inquiry";
 import { isNotFound, storefront } from "@/lib/storefront";
 
 type Props = { params: Promise<{ listingId: string }> };
@@ -24,9 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ListingPage({ params }: Props) {
   const { listingId } = await params;
   const { card, description, photos, amenities, address1, postalCode, property, virtualTourUrl } = await load(listingId);
-  const siteKey = turnstileSiteKey();
-  const mode: InquiryMode = siteKey ? { kind: "widget", siteKey } : process.env.NODE_ENV === "production" ? { kind: "off" } : { kind: "development" };
-  const { contact } = await storefront().site.get();
+  const site = await storefront().site.get();
+  const { contact } = site;
+  const mode = inquiryMode(site);
 
   return (
     <article className="detail">

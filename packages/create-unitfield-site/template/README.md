@@ -65,10 +65,16 @@ refresh whose result is dropped signs the customer out.
 ## Inquiries
 
 The form posts from the browser to the Unitfield API with your publishable key, so the limits count the visitor and not your
-server. The API requires a Cloudflare Turnstile token with every inquiry and verifies it itself. Without `TURNSTILE_SITE_KEY`
-a development build sends a placeholder token (accepted only by an API that has Turnstile switched off) and a production build
-shows your contact details instead of the form. A rejected token is answered like an accepted inquiry and nothing is created,
-so do not rely on inquiries in production until the Turnstile site key for your domain is set up with Unitfield.
+server. The API requires a Cloudflare Turnstile token with every inquiry and verifies it itself. The token must come from the
+widget Unitfield made for your site, so the form reads its site key from the API (`site.turnstileSiteKey`) and there is nothing
+to configure: the widget works on your site's domains and on the origins you allowed for your key (`http://localhost` for a
+test key). Add your site's origin under Allowed origins for your key; the widget follows within a minute. A rejected token is
+answered like an accepted inquiry and nothing is created, so a form whose widget does not load (the origin is not allowed, for
+one) never sends anything.
+
+Without a site key from the API, a development build sends a placeholder token (accepted only by an API that has Turnstile
+switched off) and a production build shows your contact details instead of the form. `TURNSTILE_SITE_KEY` stands in for an API
+that sends no key.
 
 ## Webhooks
 

@@ -5,10 +5,10 @@ import { isUnitfieldError, RateLimitError, ValidationError } from "@unitfield/sd
 import { useId, useState, type FormEvent } from "react";
 import { Turnstile } from "./turnstile";
 
-// How the form gets the anti-bot token the API requires:
-// - "widget": a Cloudflare Turnstile site key is configured and the widget runs.
-// - "development": no site key, and this is a development build. A placeholder token is sent, which only works against
-//   an API that has Turnstile switched off. Production builds never send it.
+// How the form gets the anti-bot token the API requires (the mode is chosen in lib/inquiry.ts):
+// - "widget": the Cloudflare Turnstile widget Unitfield made for your site runs (its site key comes from `site.turnstileSiteKey`).
+// - "development": the API sent no site key, and this is a development build. A placeholder token is sent, which only works
+//   against an API that has Turnstile switched off. Production builds never send it.
 // - "off": no way to get a token, so the form is replaced by the contact details.
 export type InquiryMode = { kind: "widget"; siteKey: string } | { kind: "development" } | { kind: "off" };
 

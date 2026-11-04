@@ -41,10 +41,17 @@ export type StorefrontNavigation = {
 export type StorefrontHostedUrls = Wire<Schemas["StorefrontHostedUrls"]>;
 
 /** `GET /site`. `status` is `published`, or `preview` for a draft read. `revision` changes on every publish; the response ETag derives from it. */
-export type StorefrontSite = Omit<Wire<Schemas["StorefrontSite"]>, "navigation" | "settings"> & {
+export type StorefrontSite = Omit<Wire<Schemas["StorefrontSite"]>, "navigation" | "settings" | "turnstileSiteKey"> & {
   /** The theme's settings: opaque JSON the theme's schema defines. */
   settings: Record<string, unknown>;
   navigation: StorefrontNavigation;
+  /**
+   * The public site key of the Cloudflare Turnstile widget Unitfield made for your site. Its allowed hostnames are your site's
+   * domains and the origins of your keys, and only the API holds its secret. Render the widget with this key and send the token
+   * as `turnstileToken` when you create an inquiry: a token from any other widget is rejected. `null` while your site has no widget
+   * (a key with no allowed origin yet, or an environment where widgets are not set up); absent on an older API.
+   */
+  turnstileSiteKey?: string | null;
 };
 
 /** One page of the site document. The theme's section schemas define the rest of its shape. */
@@ -116,7 +123,11 @@ export type InquiryInput = {
    * contains that local time. Kept for sites that have not moved to `picks`.
    */
   preferredTimes?: (string | Date)[];
-  /** Cloudflare Turnstile token from the widget; verified server-side. */
+  /**
+   * Cloudflare Turnstile token, verified server-side. It must come from the widget made for your site: render it with
+   * `site.turnstileSiteKey` (from `site.get()`). A token from another widget is rejected, and a rejected token is answered like an
+   * accepted inquiry with nothing created.
+   */
   turnstileToken: string;
 };
 

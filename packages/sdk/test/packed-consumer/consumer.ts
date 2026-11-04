@@ -66,6 +66,10 @@ const manifest: AppManifest = {
 
 const storefront = createStorefrontClient({ publishableKey: "pk_test_abcdefghijklmnopqrstuvwxyz012345" });
 const site: Promise<StorefrontSite> = storefront.site.get();
+// The site carries the public key of its own Turnstile widget, or null; an older API sends nothing.
+async function turnstileSiteKey(): Promise<string | null | undefined> {
+  return (await site).turnstileSiteKey;
+}
 // The API returns the menus as { header, footer }, never a bare list.
 const menus: StorefrontSite["navigation"] = { header: [{ label: "Homes", pageId: "p_homes", url: null }], footer: [{ label: "Call us", pageId: null, url: "tel:+15550100" }] };
 const page: Promise<CursorPage<ListingSummary>> = storefront.listings.list({ city: "Austin", limit: 12, sort: "rent_desc" });
@@ -131,4 +135,4 @@ function describe(error: unknown): string {
   return isUnitfieldError(error) ? error.code : "unknown";
 }
 
-void [storefrontClientId, hostStatus, bedrooms, rent, latitude, progress, platform, sameType, generated, invalidAction, manifest, site, page, detail, detailTitle, firstListing, request, tokens, lease, applicant, draft, handle, serverStore, requestCookie, describe];
+void [storefrontClientId, hostStatus, bedrooms, rent, latitude, progress, platform, sameType, generated, invalidAction, manifest, site, turnstileSiteKey, page, detail, detailTitle, firstListing, request, tokens, lease, applicant, draft, handle, serverStore, requestCookie, describe];

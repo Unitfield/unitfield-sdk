@@ -25,7 +25,7 @@ const { items, nextCursor } = await storefront.listings.list({ city: "Austin", b
 for await (const listing of storefront.listings.iterate({ city: "Austin" }, { maxItems: 100 })) {
   console.log(listing.title, listing.applyUrl);
 }
-await storefront.inquiries.create({ kind: "contact", name, email, message, turnstileToken });
+await storefront.inquiries.create({ kind: "contact", name, email, message, turnstileToken }); // token from the widget rendered with site.turnstileSiteKey
 ```
 
 Methods: `hosts.resolve`, `site.get`, `pages.get`, `listings.list|iterate|get`,

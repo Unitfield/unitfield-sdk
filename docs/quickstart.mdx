@@ -122,10 +122,18 @@ await storefront.inquiries.create({
   email: "pat@example.com",
   listingPublicId: listing.listingPublicId,
   preferredTimes: [new Date("2026-11-20T15:00:00Z")], // up to five
-  turnstileToken, // from a Cloudflare Turnstile widget
+  turnstileToken, // from the Turnstile widget made for your site, see below
 });
 ```
 
+The API requires a Cloudflare Turnstile token with every inquiry. Unitfield makes a widget for your site and sends its public
+site key with the site: render the widget with `site.turnstileSiteKey` and send the token it gives you. The widget works on your
+site's domains and on the origins you allowed for your key, so add your site's origin to the key first. A token from any other
+widget is rejected.
+
+```ts
+const { turnstileSiteKey } = await storefront.site.get(); // null while your site has no widget yet
+```
+
 The API answers `202` for every accepted request, and also when the Turnstile check failed: nothing is created then, and the
-response does not say so. Staff see a real inquiry as a prospect in People and are notified. See the
-[Known gaps](./index#known-gaps) about the Turnstile site key.
+response does not say so. Staff see a real inquiry as a prospect in People and are notified.

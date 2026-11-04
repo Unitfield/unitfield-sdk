@@ -44,6 +44,15 @@ test("every read sends the key to /api/storefront/v1, omits cookies and stays ca
   }
 });
 
+test("the site read carries the Turnstile site key of the site's own widget, and null or nothing when it has none", async () => {
+  const answers = [{ siteId: "site_1", turnstileSiteKey: "0x4AAAAAAABkMYinukE8nzYS" }, { siteId: "site_1", turnstileSiteKey: null }, { siteId: "site_1" }];
+  const { fetch } = recorder(() => Response.json(answers.shift()));
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch });
+  assert.equal((await client.site.get()).turnstileSiteKey, "0x4AAAAAAABkMYinukE8nzYS", "render the widget with this key");
+  assert.equal((await client.site.get()).turnstileSiteKey, null, "a site without a widget");
+  assert.equal((await client.site.get()).turnstileSiteKey, undefined, "an older API does not send it");
+});
+
 const resolution = {
   status: "active", kind: "organization", host: "acme.unitfield.app", role: "primary", siteId: "site_1", organizationId: "org_1", slug: "acme",
   publishableKey, storefrontClientId: "sfc_0123456789abcdef", primaryHost: "acme.unitfield.app", redirectTo: null, revision: 7, hosts: ["acme.unitfield.app"],

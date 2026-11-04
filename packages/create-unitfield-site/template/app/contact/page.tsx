@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { InquiryForm, type InquiryMode } from "@/components/inquiry-form";
-import { turnstileSiteKey } from "@/lib/config";
+import { InquiryForm } from "@/components/inquiry-form";
+import { inquiryMode } from "@/lib/inquiry";
 import { storefront } from "@/lib/storefront";
 
 export const metadata: Metadata = { title: "Contact" };
 
 export default async function ContactPage() {
-  const { contact, brand } = await storefront().site.get();
-  const siteKey = turnstileSiteKey();
-  const mode: InquiryMode = siteKey ? { kind: "widget", siteKey } : process.env.NODE_ENV === "production" ? { kind: "off" } : { kind: "development" };
+  const site = await storefront().site.get();
+  const { contact, brand } = site;
+  const mode = inquiryMode(site);
 
   return (
     <div className="narrow">

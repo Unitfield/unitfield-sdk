@@ -447,6 +447,7 @@ export interface components {
             status: string;
             themeId: string;
             themeVersion: string;
+            turnstileSiteKey?: null | string;
         };
         StorefrontTourPick: {
             date: string;
