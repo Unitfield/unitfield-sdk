@@ -1,0 +1,27 @@
+{
+  "$comment": "What the public API reference leaves out. Read by scripts/generate-reference.mjs (docs/reference/index.mdx) and by apps/developers (the developer site). A rule hides an operation when its path starts with one of `pathPrefixes` or it carries one of `tags`. `unpublishedSurfaces` are whole snapshot documents that are not listed at all. `forbiddenInOutput` is a regular expression (case-insensitive) that must not appear anywhere in published text.",
+  "unpublishedSurfaces": ["customer-auth"],
+  "deny": [
+    {
+      "reason": "Hydra provider hooks of the customer sign-in issuer, called by Unitfield's own servers",
+      "pathPrefixes": ["/api/customer-auth/v1/hydra/"],
+      "tags": []
+    },
+    {
+      "reason": "vendor review queue and decisions, for Unitfield staff",
+      "pathPrefixes": ["/api/platform/v1/app-reviews"],
+      "tags": ["Platform vendor review"]
+    },
+    {
+      "reason": "the vendor developer lane (own versions, review history, withdrawal, credential delivery), which needs global vendor roles",
+      "pathPrefixes": ["/api/platform/v1/developer/"],
+      "tags": ["Platform vendor apps"]
+    },
+    {
+      "reason": "extension-host routes, which Unitfield's own dashboard uses to host extensions",
+      "pathPrefixes": ["/api/platform/v1/extension-hosts/"],
+      "tags": []
+    }
+  ],
+  "forbiddenInOutput": "\\bhydra\\b|\\bkratos\\b|app-reviews|extension-hosts|-dev\\.unitfield\\.|api-dev\\.|id-dev\\.|auth-dev\\.|127\\.0\\.0\\.1:47\\d\\d|localhost:47\\d\\d"
+}

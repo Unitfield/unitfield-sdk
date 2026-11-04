@@ -491,19 +491,23 @@ pre {
   --uf-raised-shadow: none;
 }
 
-/* The sidebar is the canvas; the page you are on is lifted out of it. */
+/* The sidebar is the canvas; the page you are on is one step darker, with heavier text. No outline, no bar. */
 #nd-sidebar a[data-active="true"],
 #nd-sidebar button[data-active="true"] {
-  background: var(--uf-raised);
+  background: var(--uf-sunken);
   color: var(--uf-ink);
   font-weight: 700;
-  box-shadow: var(--uf-raised-shadow);
+  box-shadow: none;
+}
+#nd-sidebar a[data-active="true"]::before {
+  content: none;
+  display: none;
 }
 #nd-sidebar a {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 #nd-sidebar a:hover:not([data-active="true"]) {
-  background: var(--uf-sunken);
+  background: color-mix(in oklch, var(--uf-sunken) 55%, transparent);
   color: var(--uf-ink);
 }
 

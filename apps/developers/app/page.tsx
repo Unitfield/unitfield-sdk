@@ -10,7 +10,9 @@ import { guideSource } from "@/lib/source";
 
 const heroCode = `import { createStorefrontClient } from "@unitfield/sdk";
 
-const storefront = createStorefrontClient({ publishableKey: "pk_test_…" });
+const storefront = createStorefrontClient({
+  publishableKey: "pk_test_…",
+});
 
 const { items } = await storefront.listings.list({
   bedroomsMin: 2,

@@ -27,9 +27,6 @@ The API root is `https://api.unitfield.com`. The installed apps API also has a s
   <Card title="App management API" href="/reference/platform">
     Catalog, installations, grants and webhook subscriptions, for a signed-in staff user.
   </Card>
-  <Card title="Customer auth API" href="/reference/customer-auth">
-    Sign-in challenges and sessions. First-party servers only.
-  </Card>
 </Cards>
 
 ## Authentication
@@ -40,7 +37,6 @@ The API root is `https://api.unitfield.com`. The installed apps API also has a s
 | Customer, Resident | A customer access token from the customer sign-in, as a bearer token. | [Customer sign-in with PKCE](/docs/customer-sign-in) |
 | Installed apps | A client-credentials token for the app's installation, within the scopes granted to it. | [Webhooks](/docs/webhooks) |
 | App management | A signed-in Unitfield staff user's token. An installed app's token cannot call it. | |
-| Customer auth | Unitfield's own servers only. | |
 
 ## Errors
 

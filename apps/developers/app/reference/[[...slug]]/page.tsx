@@ -1,10 +1,8 @@
-import { Callout } from "fumadocs-ui/components/callout";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/notebook/page";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { OpenAPIPage } from "@/components/api-page";
 import { getMDXComponents } from "@/components/mdx";
-import { SURFACES } from "@/lib/public-api/surfaces";
 import { referenceLoader } from "@/lib/source";
 
 export function generateStaticParams() {
@@ -24,12 +22,10 @@ export default async function Page(props: PageProps<"/reference/[[...slug]]">) {
   if (!page) notFound();
 
   if (page.type === "openapi") {
-    const notice = SURFACES.find((surface) => surface.id === page.slugs[0])?.notice;
     return (
       <DocsPage full>
         <DocsTitle>{page.data.title}</DocsTitle>
         <DocsBody>
-          {notice ? <Callout type="warn">{notice}</Callout> : null}
           <OpenAPIPage {...page.data.getOpenAPIPageProps()} showTitle={false} showDescription />
         </DocsBody>
       </DocsPage>

@@ -161,13 +161,6 @@ function applyAuth(surface: Surface, document: ApiDocument): void {
     document.security = [{ OAuth2: [] }, { Bearer: [] }];
     return;
   }
-
-  if (surface.id === "customer-auth") {
-    // First-party servers authenticate with signed service requests that are not part of any public contract.
-    document.components.securitySchemes = {};
-    document.security = [];
-    for (const item of Object.values<Record<string, any>>(document.paths)) for (const method of METHODS) if (item[method]) item[method].security = [];
-  }
 }
 
 function retag(surface: Surface, document: ApiDocument): void {

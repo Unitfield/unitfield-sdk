@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 // What the site publishes of the API, and how it is described. The operations come from the committed OpenAPI snapshots
 // (packages/sdk/openapi/*.json); everything here is editorial: titles, who calls what, which operations stay out.
 //
@@ -17,32 +20,23 @@ export interface Surface {
   group: (record: OperationRecord) => string;
   /** Group titles, in the order they appear. Groups that are not listed come last. */
   groupOrder: string[];
-  /** Shown as a notice on every page of the surface. */
-  notice?: string;
 }
 
+// What stays out of the public reference is one shared file, scripts/public-api-filter.json, read here and by scripts/generate-reference.mjs.
+const FILTER = JSON.parse(readFileSync(resolve(process.cwd(), "../../scripts/public-api-filter.json"), "utf8")) as {
+  unpublishedSurfaces: string[];
+  deny: { reason: string; pathPrefixes: string[]; tags: string[] }[];
+  forbiddenInOutput: string;
+};
+
 /** Operations the public site never documents. Each rule names why, so the filter report reads as a list of decisions. */
-export const DENY_RULES: { reason: string; matches: (record: OperationRecord) => boolean }[] = [
-  {
-    reason: "customer-auth Hydra provider hooks (Unitfield's own sign-in issuer calls them)",
-    matches: ({ path }) => /^\/api\/customer-auth\/v1\/hydra\//.test(path),
-  },
-  {
-    reason: "vendor review queue and decisions (Unitfield staff only)",
-    matches: ({ path, operation }) => path.startsWith("/api/platform/v1/app-reviews") || (operation.tags ?? []).includes("Platform vendor review"),
-  },
-  {
-    reason: "vendor developer lane: own versions, review history, withdrawal and credential delivery (global vendor roles, not the public SDK surface)",
-    matches: ({ path, operation }) => path.startsWith("/api/platform/v1/developer/") || (operation.tags ?? []).includes("Platform vendor apps"),
-  },
-  {
-    reason: "extension-host routes (Unitfield's own dashboard hosts extensions through them)",
-    matches: ({ path }) => path.startsWith("/api/platform/v1/extension-hosts/"),
-  },
-];
+export const DENY_RULES: { reason: string; matches: (record: OperationRecord) => boolean }[] = FILTER.deny.map((rule) => ({
+  reason: rule.reason,
+  matches: ({ path, operation }) => rule.pathPrefixes.some((prefix) => path.startsWith(prefix)) || (operation.tags ?? []).some((tag: string) => rule.tags.includes(tag)),
+}));
 
 /** Words that must never reach a published page, in any operation, schema or description. The build fails if one does. */
-export const FORBIDDEN_IN_OUTPUT = /\bhydra\b|\bkratos\b|app-reviews|extension-hosts|-dev\.unitfield\.|api-dev\.|id-dev\.|auth-dev\.|127\.0\.0\.1:47\d\d|localhost:47\d\d/i;
+export const FORBIDDEN_IN_OUTPUT = new RegExp(FILTER.forbiddenInOutput, "i");
 
 const first = (path: string, prefix: string) => path.slice(prefix.length).split("/").filter(Boolean)[0] ?? "";
 
@@ -108,15 +102,6 @@ export const SURFACES: Surface[] = [
       return "Apps and installations";
     },
   },
-  {
-    id: "customer-auth",
-    title: "Customer auth API",
-    summary: "Sign-in challenges, sessions and account changes for customers.",
-    groupOrder: ["Sign-in and sessions"],
-    group: () => "Sign-in and sessions",
-    notice:
-      "First-party servers only. Unitfield's own storefront calls this API with signed service requests. Browsers and SDK sites never call it, and the SDK has no client for it. It is listed here for completeness: to sign customers in on your own site, use [customer sign-in with PKCE](/docs/customer-sign-in).",
-  },
 ];
 
 /** Storefront operations are described by hand: the snapshot's own text is generated from the operation ids. */
@@ -152,3 +137,7 @@ export const STOREFRONT_TEXT: Record<string, { summary: string; description: str
   Storefront_AnswerTour: { summary: "Answer a tour", description: "Records a visitor's answer to a tour: accept a proposed time, say they are coming or cannot make it, pick a time or cancel. It works behind the tour's private token. An unknown, expired, revoked or foreign token is one uniform `404`. Limited per visitor address.", sdk: "storefront.tours.answer" },
   Storefront_TourIcs: { summary: "Download a tour calendar file", description: "The tour as an iCalendar file (`text/calendar`), behind its private token. Limited per visitor address.", sdk: "storefront.tours.icsUrl" },
 };
+
+for (const surface of SURFACES) {
+  if (FILTER.unpublishedSurfaces.includes(surface.id)) throw new Error(`The ${surface.id} surface is listed as unpublished in scripts/public-api-filter.json.`);
+}

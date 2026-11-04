@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Checks the static export in out/ before anything deploys it:
-//   - no word of an API this site never publishes (the same list as lib/public-api/surfaces.ts: FORBIDDEN_IN_OUTPUT);
+//   - no word of an API this site never publishes (scripts/public-api-filter.json, forbiddenInOutput);
 //   - every internal link points at a file the export has;
 //   - the pages that must exist do.
 import { readdir, readFile, stat } from "node:fs/promises";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const app = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(app, "out");
-const FORBIDDEN = /\bhydra\b|\bkratos\b|app-reviews|extension-hosts|-dev\.unitfield\.|api-dev\.|id-dev\.|auth-dev\.|127\.0\.0\.1:47\d\d|localhost:47\d\d/i;
+const FORBIDDEN = new RegExp(JSON.parse(await readFile(join(app, "../../scripts/public-api-filter.json"), "utf8")).forbiddenInOutput, "i");
 const TEXT = new Set([".html", ".txt", ".js", ".json", ".css", ".xml", ""]);
 const MUST_EXIST = ["index.html", "docs/index.html", "docs/quickstart/index.html", "docs/webhooks/index.html", "reference/index.html", "reference/webhook-events/index.html", "reference/storefront/listings/list-listings/index.html", "api/search", "404.html", "robots.txt", "sitemap.xml"];
 
@@ -48,7 +48,7 @@ for (const file of files) {
   if (leak) fail(`${name} mentions "${leak[0]}", which this site never publishes.`);
   if (!name.endsWith(".html")) continue;
   pages++;
-  if (/^reference\/(storefront|customer|resident|apps|platform|customer-auth)\/[^/]+\/[^/]+\/index\.html$/.test(name)) operations++;
+  if (/^reference\/(storefront|customer|resident|apps|platform)\/[^/]+\/[^/]+\/index\.html$/.test(name)) operations++;
 
   for (const [, href] of text.matchAll(/<a [^>]*?href="([^"]+)"/g)) {
     if (!href.startsWith("/") || href.startsWith("//")) continue;
