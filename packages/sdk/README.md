@@ -89,7 +89,7 @@ single-flight, and across tabs serialized with the Web Locks API.
 Server flows keep tokens out of JavaScript: `createCookieTokenStore` and
 `createAuthorizationRequestCookie` (`@unitfield/sdk/server`) seal them with
 AES-256-GCM into httpOnly `__Host-` cookies over any cookie jar (Next.js `cookies()`
-fits as is). `/api/customer-auth/v1` is a first-party server API with no SDK client.
+fits as is).
 
 ## Resident and applicant
 
@@ -124,8 +124,8 @@ Basic), requests the `unitfield-api` audience, refuses redirects, caches tokens 
 fetches a fresh one when the API answers 401. `AppsClient` covers `/api/apps/v1`
 (organization, listings, payments, checkout sessions, app actions and the rental
 application helpers). `PlatformClient` covers app management
-(`/api/platform/v1`): catalog, installations and grants, vendor review, native
-extension hosts and per-installation webhooks. It needs a real Unitfield staff
+(`/api/platform/v1`): catalog, installations and grants, and per-installation
+webhooks. It needs a real Unitfield staff
 session; business routes take the organization UUID and send `X-Tenant-Id`.
 
 ## Webhooks (server)
