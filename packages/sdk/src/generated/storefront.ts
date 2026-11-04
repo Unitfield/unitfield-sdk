@@ -451,21 +451,35 @@ export interface components {
         };
         StorefrontTourPick: {
             date: string;
-            window: string;
+            /**
+             * @description Allowed values: 'morning', 'afternoon', 'evening'.
+             * @enum {string}
+             */
+            window: "morning" | "afternoon" | "evening";
         };
+        /** Format: binary */
+        Stream: string;
         TourAnswerRequest: {
-            action: null | string;
+            /**
+             * @description Allowed values: 'accept_proposal', 'coming', 'cant_make_it', 'cancel', 'pick'.
+             * @enum {string}
+             */
+            action: "accept_proposal" | "coming" | "cant_make_it" | "cancel" | "pick";
             message?: null | string;
             picks?: null | components["schemas"]["StorefrontTourPick"][];
-            token: null | string;
+            token: string;
         };
         TourOfferDayDto: {
             date: string;
-            weekday: string;
-            windows: string[];
+            /**
+             * @description Allowed values: 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'.
+             * @enum {string}
+             */
+            weekday: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
+            windows: ("morning" | "afternoon" | "evening")[];
         };
         TourViewRequest: {
-            token: null | string;
+            token: string;
         };
         TourVisitorProposal: {
             date: string;
@@ -489,7 +503,11 @@ export interface components {
             picks: components["schemas"]["StorefrontTourPick"][];
             proposal: null | components["schemas"]["TourVisitorProposal"];
             start: null | string;
-            status: string;
+            /**
+             * @description Allowed values: 'requested', 'needs_time', 'scheduled', 'toured', 'no_show', 'canceled', 'applied'.
+             * @enum {string}
+             */
+            status: "requested" | "needs_time" | "scheduled" | "toured" | "no_show" | "canceled" | "applied";
             zoneId: string;
         };
         TourWindowRangeDto: {
@@ -499,7 +517,7 @@ export interface components {
         TourWindowsDto: {
             days: components["schemas"]["TourOfferDayDto"][];
             /** Format: int32 */
-            maxPicks: number | string;
+            maxPicks: number;
             windows: {
                 [key: string]: components["schemas"]["TourWindowRangeDto"];
             };
@@ -1630,7 +1648,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "text/calendar": components["schemas"]["Stream"];
+                };
             };
             /** @description Bad request (validation/format errors) */
             400: {
@@ -1686,7 +1706,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["UnitfieldValidationProblemDetails"];
                 };
             };
-            /** @description Too many requests */
+            /** @description Too Many Requests */
             429: {
                 headers: {
                     [name: string]: unknown;

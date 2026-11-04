@@ -1432,7 +1432,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/calendar": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad request (validation/format errors)",
@@ -1495,7 +1502,7 @@
             }
           },
           "429": {
-            "description": "Too many requests",
+            "description": "Too Many Requests",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2666,9 +2673,19 @@
             "type": "string"
           },
           "window": {
-            "type": "string"
+            "enum": [
+              "morning",
+              "afternoon",
+              "evening"
+            ],
+            "type": "string",
+            "description": "Allowed values: 'morning', 'afternoon', 'evening'."
           }
         }
+      },
+      "Stream": {
+        "type": "string",
+        "format": "binary"
       },
       "TourAnswerRequest": {
         "required": [
@@ -2678,16 +2695,18 @@
         "type": "object",
         "properties": {
           "token": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "action": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "enum": [
+              "accept_proposal",
+              "coming",
+              "cant_make_it",
+              "cancel",
+              "pick"
+            ],
+            "type": "string",
+            "description": "Allowed values: 'accept_proposal', 'coming', 'cant_make_it', 'cancel', 'pick'."
           },
           "picks": {
             "type": [
@@ -2718,12 +2737,28 @@
             "type": "string"
           },
           "weekday": {
-            "type": "string"
+            "enum": [
+              "mon",
+              "tue",
+              "wed",
+              "thu",
+              "fri",
+              "sat",
+              "sun"
+            ],
+            "type": "string",
+            "description": "Allowed values: 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'."
           },
           "windows": {
             "type": "array",
             "items": {
-              "type": "string"
+              "enum": [
+                "morning",
+                "afternoon",
+                "evening"
+              ],
+              "type": "string",
+              "description": "Allowed values: 'morning', 'afternoon', 'evening'."
             }
           }
         }
@@ -2735,10 +2770,7 @@
         "type": "object",
         "properties": {
           "token": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           }
         }
       },
@@ -2794,7 +2826,17 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string"
+            "enum": [
+              "requested",
+              "needs_time",
+              "scheduled",
+              "toured",
+              "no_show",
+              "canceled",
+              "applied"
+            ],
+            "type": "string",
+            "description": "Allowed values: 'requested', 'needs_time', 'scheduled', 'toured', 'no_show', 'canceled', 'applied'."
           },
           "orgName": {
             "type": "string"
@@ -2927,11 +2969,7 @@
             }
           },
           "maxPicks": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         }

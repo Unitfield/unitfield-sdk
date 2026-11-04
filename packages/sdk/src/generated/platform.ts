@@ -706,6 +706,8 @@ export interface components {
             /** Format: int64 */
             expectedGeneration: number | string;
             manifestHash: string;
+            /** @default false */
+            rotateCredentials: boolean;
         };
         CreateWebhookSubscriptionDto: {
             events: string[];

@@ -135,8 +135,9 @@ export type InquiryInput = {
 export type InquiryAccepted = Wire<Schemas["StorefrontInquiryAccepted"]>;
 
 /*
- * Tours (`GET /tour-windows`, `POST /tours/view`, `POST /tours/answer`, `GET /tours/ics`). The shapes are the generated ones; the
- * document types `status`, the window keys and the answer action as plain strings, so those carry their known values here.
+ * Tours (`GET /tour-windows`, `POST /tours/view`, `POST /tours/answer`, `GET /tours/ics`). The shapes are the generated ones. The
+ * document lists the allowed values of `status`, the window keys, `weekday` and the answer action as enums; they are named here as
+ * unions (`(string & {})` on `weekday` keeps a value added later from breaking a build).
  */
 
 /** A tour window of the organization's day: morning, afternoon or evening. The hours come from `TourWindows.windows`. */
