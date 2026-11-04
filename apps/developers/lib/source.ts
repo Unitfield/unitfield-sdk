@@ -159,6 +159,13 @@ export const referenceLoader = loader(
   },
 );
 
+/** The page of one published operation, for example `/reference/storefront/listings/list-listings`. Throws when the operation is not published. */
+export function referenceUrl(surfaceId: string, path: string, method: string): string {
+  const found = plan.names.get(`${surfaceId}\n${path}\n${method.toLowerCase()}`);
+  if (!found) throw new Error(`No reference page for ${method} ${path} of the ${surfaceId} API.`);
+  return `/reference/${surfaceId}/${kebab(found.group)}/${found.slug}`;
+}
+
 /** "Storefront API" and "Listings" for /reference/storefront/listings/list-listings: the trail above an operation in the sidebar. */
 export function referenceBreadcrumbs(url: string): string[] {
   const [surfaceId, group] = url.replace(/^\/reference\/?/, "").split("/").filter(Boolean);
