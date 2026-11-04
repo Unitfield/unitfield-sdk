@@ -1,0 +1,688 @@
+{
+  "source": "src/Unitfield.Modules/Platform/Apps/Events/PlatformEventCatalog.cs",
+  "sourceSha256": "6c08c811d347176b5b669fd9c5093b58aa8ed6eb68c6013a8d48bedf34b228dc",
+  "envelope": {
+    "version": "1"
+  },
+  "groups": [
+    {
+      "id": "listings",
+      "title": "Listings"
+    },
+    {
+      "id": "site",
+      "title": "Site"
+    },
+    {
+      "id": "inquiries",
+      "title": "Inquiries"
+    },
+    {
+      "id": "applications",
+      "title": "Rental applications"
+    },
+    {
+      "id": "payments",
+      "title": "Payments"
+    },
+    {
+      "id": "leases",
+      "title": "Leases"
+    },
+    {
+      "id": "testing",
+      "title": "Testing"
+    }
+  ],
+  "events": [
+    {
+      "name": "listing.published",
+      "group": "listings",
+      "when": "A listing was published.",
+      "scopes": [
+        "listings:read"
+      ],
+      "siteEndpoint": true,
+      "planNeeds": null,
+      "resourceField": "listingPublicId",
+      "listFields": [],
+      "fields": [
+        "listingPublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "previousVisibility",
+        "currentVisibility",
+        "publishedAtUtc",
+        "updatedAtUtc",
+        "occurredAtUtc",
+        "availableFromUtc",
+        "isAvailable"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "listing.updated",
+      "group": "listings",
+      "when": "A published listing changed.",
+      "scopes": [
+        "listings:read"
+      ],
+      "siteEndpoint": true,
+      "planNeeds": null,
+      "resourceField": "listingPublicId",
+      "listFields": [],
+      "fields": [
+        "listingPublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "previousVisibility",
+        "currentVisibility",
+        "publishedAtUtc",
+        "updatedAtUtc",
+        "occurredAtUtc",
+        "availableFromUtc",
+        "isAvailable"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "listing.unpublished",
+      "group": "listings",
+      "when": "A listing was taken off your site.",
+      "scopes": [
+        "listings:read"
+      ],
+      "siteEndpoint": true,
+      "planNeeds": null,
+      "resourceField": "listingPublicId",
+      "listFields": [],
+      "fields": [
+        "listingPublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "previousVisibility",
+        "currentVisibility",
+        "publishedAtUtc",
+        "updatedAtUtc",
+        "occurredAtUtc",
+        "availableFromUtc",
+        "isAvailable"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "listing.availability_changed",
+      "group": "listings",
+      "when": "A listing's availability changed.",
+      "scopes": [
+        "listings:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": "listingPublicId",
+      "listFields": [],
+      "fields": [
+        "listingPublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "previousVisibility",
+        "currentVisibility",
+        "publishedAtUtc",
+        "updatedAtUtc",
+        "occurredAtUtc",
+        "availableFromUtc",
+        "isAvailable"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "site.published",
+      "group": "site",
+      "when": "A revision of your site was published.",
+      "scopes": [
+        "listings:read"
+      ],
+      "siteEndpoint": true,
+      "planNeeds": null,
+      "resourceField": "sitePublicId",
+      "listFields": [
+        "hosts"
+      ],
+      "fields": [
+        "sitePublicId",
+        "revision",
+        "hosts",
+        "occurredAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "site.unpublished",
+      "group": "site",
+      "when": "Your site was unpublished.",
+      "scopes": [
+        "listings:read"
+      ],
+      "siteEndpoint": true,
+      "planNeeds": null,
+      "resourceField": "sitePublicId",
+      "listFields": [
+        "hosts"
+      ],
+      "fields": [
+        "sitePublicId",
+        "revision",
+        "hosts",
+        "occurredAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "inquiry.created",
+      "group": "inquiries",
+      "when": "A visitor sent a contact or tour inquiry through your site. It says that one arrived and about what, and never carries the visitor's name, email, phone or message.",
+      "scopes": [
+        "applications:read"
+      ],
+      "siteEndpoint": true,
+      "planNeeds": null,
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "kind",
+        "listingPublicId",
+        "propertyPublicId",
+        "occurredAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "rental_application.submitted",
+      "group": "applications",
+      "when": "An applicant submitted a rental application.",
+      "scopes": [
+        "applications:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": "applicationPublicId",
+      "listFields": [],
+      "fields": [
+        "applicationPublicId",
+        "draftPublicId",
+        "listingPublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "submittedAtUtc",
+        "occurredAtUtc",
+        "attachmentType",
+        "fileName",
+        "uploadedAtUtc",
+        "stage",
+        "screeningStatus",
+        "contentType"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "rental_application.attachment_uploaded",
+      "group": "applications",
+      "when": "A file was uploaded to a rental application.",
+      "scopes": [
+        "applications:read",
+        "files:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "applicationPublicId",
+        "draftPublicId",
+        "listingPublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "submittedAtUtc",
+        "occurredAtUtc",
+        "attachmentType",
+        "fileName",
+        "uploadedAtUtc",
+        "stage",
+        "screeningStatus",
+        "contentType"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "rental_application.screening.payment_succeeded",
+      "group": "applications",
+      "when": "An applicant's screening payment succeeded.",
+      "scopes": [
+        "applications:read",
+        "payments:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": "screening",
+      "resourceField": "applicationPublicId",
+      "listFields": [],
+      "fields": [
+        "paymentPublicId",
+        "applicationPublicId",
+        "leasePublicId",
+        "leasePaymentPublicId",
+        "chargePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "amount",
+        "currency",
+        "purpose",
+        "paymentMethod",
+        "occurredAtUtc",
+        "paidAtUtc",
+        "dueDate",
+        "description",
+        "category",
+        "remainingAmount",
+        "allocatedAmount",
+        "transactionDateUtc",
+        "dueDateUtc",
+        "createdAtUtc",
+        "postedAtUtc",
+        "paymentStatus",
+        "screeningStatus",
+        "processedAtUtc",
+        "updatedAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "rental_application.screening.payment_failed",
+      "group": "applications",
+      "when": "An applicant's screening payment failed.",
+      "scopes": [
+        "applications:read",
+        "payments:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": "screening",
+      "resourceField": "applicationPublicId",
+      "listFields": [],
+      "fields": [
+        "paymentPublicId",
+        "applicationPublicId",
+        "leasePublicId",
+        "leasePaymentPublicId",
+        "chargePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "amount",
+        "currency",
+        "purpose",
+        "paymentMethod",
+        "occurredAtUtc",
+        "paidAtUtc",
+        "dueDate",
+        "description",
+        "category",
+        "remainingAmount",
+        "allocatedAmount",
+        "transactionDateUtc",
+        "dueDateUtc",
+        "createdAtUtc",
+        "postedAtUtc",
+        "paymentStatus",
+        "screeningStatus",
+        "processedAtUtc",
+        "updatedAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "payment.succeeded",
+      "group": "payments",
+      "when": "A payment succeeded.",
+      "scopes": [
+        "payments:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "paymentPublicId",
+        "applicationPublicId",
+        "leasePublicId",
+        "leasePaymentPublicId",
+        "chargePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "amount",
+        "currency",
+        "purpose",
+        "paymentMethod",
+        "occurredAtUtc",
+        "paidAtUtc",
+        "dueDate",
+        "description",
+        "category",
+        "remainingAmount",
+        "allocatedAmount",
+        "transactionDateUtc",
+        "dueDateUtc",
+        "createdAtUtc",
+        "postedAtUtc",
+        "paymentStatus",
+        "screeningStatus",
+        "processedAtUtc",
+        "updatedAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "payment.failed",
+      "group": "payments",
+      "when": "A payment failed.",
+      "scopes": [
+        "payments:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "paymentPublicId",
+        "applicationPublicId",
+        "leasePublicId",
+        "leasePaymentPublicId",
+        "chargePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "amount",
+        "currency",
+        "purpose",
+        "paymentMethod",
+        "occurredAtUtc",
+        "paidAtUtc",
+        "dueDate",
+        "description",
+        "category",
+        "remainingAmount",
+        "allocatedAmount",
+        "transactionDateUtc",
+        "dueDateUtc",
+        "createdAtUtc",
+        "postedAtUtc",
+        "paymentStatus",
+        "screeningStatus",
+        "processedAtUtc",
+        "updatedAtUtc"
+      ],
+      "conditionalFields": []
+    },
+    {
+      "name": "lease.charge_created",
+      "group": "leases",
+      "when": "A charge was created on a lease.",
+      "scopes": [
+        "payments:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": "leasing and basic accounting",
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "paymentPublicId",
+        "applicationPublicId",
+        "leasePublicId",
+        "leasePaymentPublicId",
+        "chargePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "amount",
+        "currency",
+        "purpose",
+        "paymentMethod",
+        "occurredAtUtc",
+        "paidAtUtc",
+        "dueDate",
+        "description",
+        "category",
+        "remainingAmount",
+        "allocatedAmount",
+        "transactionDateUtc",
+        "dueDateUtc",
+        "createdAtUtc",
+        "postedAtUtc",
+        "paymentStatus",
+        "screeningStatus",
+        "processedAtUtc",
+        "updatedAtUtc"
+      ],
+      "conditionalFields": [
+        {
+          "field": "monthlyRent",
+          "scope": "payments:read"
+        }
+      ]
+    },
+    {
+      "name": "lease.payment_succeeded",
+      "group": "leases",
+      "when": "A payment on a lease succeeded.",
+      "scopes": [
+        "payments:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": "leasing and basic accounting",
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "paymentPublicId",
+        "applicationPublicId",
+        "leasePublicId",
+        "leasePaymentPublicId",
+        "chargePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "status",
+        "amount",
+        "currency",
+        "purpose",
+        "paymentMethod",
+        "occurredAtUtc",
+        "paidAtUtc",
+        "dueDate",
+        "description",
+        "category",
+        "remainingAmount",
+        "allocatedAmount",
+        "transactionDateUtc",
+        "dueDateUtc",
+        "createdAtUtc",
+        "postedAtUtc",
+        "paymentStatus",
+        "screeningStatus",
+        "processedAtUtc",
+        "updatedAtUtc"
+      ],
+      "conditionalFields": [
+        {
+          "field": "monthlyRent",
+          "scope": "payments:read"
+        }
+      ]
+    },
+    {
+      "name": "lease.created",
+      "group": "leases",
+      "when": "A lease was created.",
+      "scopes": [
+        "leases:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": "leasePublicId",
+      "listFields": [],
+      "fields": [
+        "leasePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "startDate",
+        "endDate",
+        "occurredAtUtc"
+      ],
+      "conditionalFields": [
+        {
+          "field": "monthlyRent",
+          "scope": "payments:read"
+        }
+      ]
+    },
+    {
+      "name": "lease.activated",
+      "group": "leases",
+      "when": "A lease became active.",
+      "scopes": [
+        "leases:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": "leasePublicId",
+      "listFields": [],
+      "fields": [
+        "leasePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "startDate",
+        "endDate",
+        "occurredAtUtc"
+      ],
+      "conditionalFields": [
+        {
+          "field": "monthlyRent",
+          "scope": "payments:read"
+        }
+      ]
+    },
+    {
+      "name": "lease.terminated",
+      "group": "leases",
+      "when": "A lease was terminated.",
+      "scopes": [
+        "leases:read"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": "leasePublicId",
+      "listFields": [],
+      "fields": [
+        "leasePublicId",
+        "propertyPublicId",
+        "unitPublicId",
+        "previousStatus",
+        "currentStatus",
+        "startDate",
+        "endDate",
+        "occurredAtUtc"
+      ],
+      "conditionalFields": [
+        {
+          "field": "monthlyRent",
+          "scope": "payments:read"
+        }
+      ]
+    },
+    {
+      "name": "webhook.test",
+      "group": "testing",
+      "when": "You sent a test delivery to a subscription from the platform API (or from Website > Developers, for a site endpoint).",
+      "scopes": [
+        "webhooks:manage"
+      ],
+      "siteEndpoint": false,
+      "planNeeds": null,
+      "resourceField": null,
+      "listFields": [],
+      "fields": [
+        "installationPublicId",
+        "webhookPublicId",
+        "message",
+        "createdAtUtc"
+      ],
+      "conditionalFields": []
+    }
+  ],
+  "fields": {
+    "allocatedAmount": "How much of the payment was applied.",
+    "amount": "The amount of the payment or charge.",
+    "applicationPublicId": "The rental application's public id.",
+    "attachmentType": "The kind of file that was attached.",
+    "availableFromUtc": "The date the home is available from (UTC).",
+    "category": "The charge category.",
+    "chargePublicId": "The charge's public id.",
+    "contentType": "The uploaded file's media type.",
+    "createdAtUtc": "When the record was created (UTC).",
+    "currency": "The currency of the amounts.",
+    "currentStatus": "The status after the change.",
+    "currentVisibility": "The visibility after the change.",
+    "description": "A description of the charge or payment.",
+    "draftPublicId": "The application draft's public id.",
+    "dueDate": "When the charge is due.",
+    "dueDateUtc": "When the charge is due (UTC).",
+    "endDate": "The lease's end date.",
+    "fileName": "The uploaded file's name.",
+    "hosts": "The host names the site is served on (a list).",
+    "installationPublicId": "The installation's public id.",
+    "isAvailable": "Whether the home is available.",
+    "kind": "`contact` or `tour`.",
+    "leasePaymentPublicId": "The lease payment's public id.",
+    "leasePublicId": "The lease's public id.",
+    "listingPublicId": "The listing's public id.",
+    "message": "A fixed message that marks the delivery as a test.",
+    "monthlyRent": "The monthly rent.",
+    "occurredAtUtc": "When the event happened (UTC).",
+    "paidAtUtc": "When the payment was made (UTC).",
+    "paymentMethod": "How the payment was made.",
+    "paymentPublicId": "The payment's public id.",
+    "paymentStatus": "The payment's status.",
+    "postedAtUtc": "When the record was posted (UTC).",
+    "previousStatus": "The status before the change.",
+    "previousVisibility": "The visibility before the change.",
+    "processedAtUtc": "When the payment was processed (UTC).",
+    "propertyPublicId": "The property's public id.",
+    "publishedAtUtc": "When the listing was published (UTC).",
+    "purpose": "What the payment is for.",
+    "remainingAmount": "What is still owed.",
+    "revision": "The site revision that was published.",
+    "screeningStatus": "The screening status.",
+    "sitePublicId": "The site's public id.",
+    "stage": "The application stage.",
+    "startDate": "The lease's start date.",
+    "status": "The current status.",
+    "submittedAtUtc": "When the application was submitted (UTC).",
+    "transactionDateUtc": "The transaction date (UTC).",
+    "unitPublicId": "The unit's public id.",
+    "updatedAtUtc": "When the record was last updated (UTC).",
+    "uploadedAtUtc": "When the file was uploaded (UTC).",
+    "webhookPublicId": "The subscription's public id."
+  }
+}

@@ -1,0 +1,2 @@
+# Cloudflare Pages redirects. packages/sdk/package.json points its homepage at this old path.
+/docs/sdk/javascript-typescript /docs/quickstart/ 301

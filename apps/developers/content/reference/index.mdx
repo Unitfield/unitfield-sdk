@@ -1,0 +1,55 @@
+---
+title: API reference
+description: Every public Unitfield API, and the webhook events Unitfield sends back.
+---
+
+The reference covers the APIs a website, an app or an integration can call. Each operation has its parameters, request and response
+bodies and example requests, generated from the OpenAPI documents the [SDK](/docs) is built from. [Webhook events](/reference/webhook-events)
+are the other direction: what Unitfield sends to you.
+
+The API root is `https://api.unitfield.com`. The installed apps API also has a sandbox, `https://api-sandbox.unitfield.com`.
+
+## The APIs
+
+<Cards>
+  <Card title="Storefront API" href="/reference/storefront">
+    Public reads of your site and homes, and inquiries and tours. A publishable key in `X-Unitfield-Key`. Start here for a website.
+  </Card>
+  <Card title="Customer API" href="/reference/customer">
+    Rental applications, and the resident documents a signed-in customer accepts.
+  </Card>
+  <Card title="Resident API" href="/reference/resident">
+    A resident's leases, payments, requests and profile.
+  </Card>
+  <Card title="Installed apps API" href="/reference/apps">
+    What an installed app calls with its client credentials and granted scopes.
+  </Card>
+  <Card title="App management API" href="/reference/platform">
+    Catalog, installations, grants and webhook subscriptions, for a signed-in staff user.
+  </Card>
+  <Card title="Customer auth API" href="/reference/customer-auth">
+    Sign-in challenges and sessions. First-party servers only.
+  </Card>
+</Cards>
+
+## Authentication
+
+| API | Credential | Guide |
+| --- | --- | --- |
+| Storefront | Publishable key, `pk_live_…` or `pk_test_…`, in `X-Unitfield-Key`. Public by design and checked against the request's origin. | [Quickstart](/docs/quickstart) |
+| Customer, Resident | A customer access token from the customer sign-in, as a bearer token. | [Customer sign-in with PKCE](/docs/customer-sign-in) |
+| Installed apps | A client-credentials token for the app's installation, within the scopes granted to it. | [Webhooks](/docs/webhooks) |
+| App management | A signed-in Unitfield staff user's token. An installed app's token cannot call it. | |
+| Customer auth | Unitfield's own servers only. | |
+
+## Errors
+
+A failed call answers with an `application/problem+json` document. `code` is a stable string you can branch on; `title`, `status`,
+`detail`, `requestId` and `supportCode` describe the failure. A validation failure (`422`) adds `errors`, a map from field name to
+messages. The SDK throws these as typed errors: see [Quickstart](/docs/quickstart#errors).
+
+## Limits and caching
+
+Storefront reads answer with `Cache-Control: public, max-age=60, stale-while-revalidate=300` and a strong `ETag`, so a browser or a CDN
+holds them for a minute. They are limited to 600 a minute for each key and address, and 6,000 a minute for each key. Inquiries are
+limited to 5 an hour for each key and address, and 100 a day for each key. A limited call answers `429`, with `Retry-After`.

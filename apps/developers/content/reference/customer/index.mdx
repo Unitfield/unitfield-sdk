@@ -1,0 +1,12 @@
+---
+title: Customer API
+description: Rental applications, and the resident documents a signed-in customer accepts.
+---
+
+What a signed-in customer does: start, fill in and submit a rental application, follow its screening and signing, and accept the
+documents of the resident portal. A customer is a renter, applicant or resident of one organization.
+
+Calls carry a **customer access token** as a bearer token. You get one from the customer sign-in, with the authorization code flow
+and PKCE, and the organization comes from the token. See [Customer sign-in with PKCE](/docs/customer-sign-in).
+
+With the SDK: `ApplicantClient`.

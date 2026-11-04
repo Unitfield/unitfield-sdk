@@ -1,0 +1,13 @@
+---
+title: App management API
+description: Catalog, installations, grants and webhook subscriptions.
+---
+
+Manage the apps of an organization: browse the catalog, install an app, change what it is granted, and manage its webhook
+subscriptions, deliveries and usage. These operations need a **signed-in Unitfield staff user** and, for an organization's
+installations, the `X-Tenant-Id` header and tenant permissions. An installed app's own token cannot call them.
+
+Webhook subscriptions created here deliver the events in the [webhook event catalog](/reference/webhook-events). The guide
+[Webhooks and revalidation](/docs/webhooks) shows how to verify a delivery.
+
+With the SDK: `PlatformClient`, for example `platform.webhooks.create()`.

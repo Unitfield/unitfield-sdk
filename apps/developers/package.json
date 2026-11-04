@@ -1,0 +1,38 @@
+{
+  "name": "@unitfield/developers",
+  "private": true,
+  "version": "0.0.0",
+  "description": "developers.unitfield.com: the SDK guides, the API reference and the webhook event catalog, built as a static site. Not published to npm.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && node scripts/verify-output.mjs",
+    "typecheck": "next typegen && tsc --noEmit",
+    "verify": "node scripts/verify-output.mjs",
+    "generate:webhook-events": "node scripts/generate-webhook-events.mjs",
+    "check:webhook-events": "node scripts/generate-webhook-events.mjs --check"
+  },
+  "dependencies": {
+    "fumadocs-core": "16.17.9",
+    "fumadocs-mdx": "15.4.10",
+    "fumadocs-openapi": "12.5.6",
+    "fumadocs-ui": "16.17.9",
+    "lucide-react": "1.62.0",
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "shiki": "4.6.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.4",
+    "@types/mdx": "2.0.14",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "postcss": "8.5.32",
+    "tailwindcss": "4.3.4",
+    "typescript": "5.9.3"
+  }
+}

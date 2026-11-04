@@ -1,0 +1,625 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@import "fumadocs-openapi/css/preset.css";
+
+/*
+ * Unitfield for developers.
+ *
+ * Tokens are the unitfield.com palette (app/site.module.css in the landing repo): warm neutrals at hue 85, near-black ink and one blue.
+ * Structure comes from tonal fills and soft shadows, not from lines: borders are off and every surface is a step of the same scale.
+ */
+
+:root {
+  --uf-page: oklch(99.6% 0.001 85);
+  --uf-canvas: oklch(96.9% 0.0015 85);
+  --uf-sunken: oklch(94.2% 0.002 85);
+  --uf-sunken-2: oklch(91.8% 0.002 85);
+  --uf-ink: oklch(19% 0.004 85);
+  --uf-ink-2: oklch(34% 0.004 85);
+  --uf-muted: oklch(48% 0.004 85);
+  --uf-faint: oklch(63% 0.004 85);
+  --uf-action: oklch(56% 0.215 261);
+  --uf-action-hover: oklch(50.5% 0.2 261);
+  --uf-on-action: oklch(99.6% 0.001 85);
+  --uf-shadow: 0 1px 2px oklch(19% 0.004 85 / 0.06), 0 8px 24px oklch(19% 0.004 85 / 0.07);
+  --uf-radius: 16px;
+}
+
+.dark {
+  --uf-page: oklch(14% 0.002 85);
+  --uf-canvas: oklch(18% 0.003 85);
+  --uf-sunken: oklch(22% 0.003 85);
+  --uf-sunken-2: oklch(26% 0.003 85);
+  --uf-ink: oklch(95% 0.004 85);
+  --uf-ink-2: oklch(86% 0.004 85);
+  --uf-muted: oklch(70% 0.004 85);
+  --uf-faint: oklch(56% 0.004 85);
+  --uf-action: oklch(68% 0.17 261);
+  --uf-action-hover: oklch(74% 0.15 261);
+  --uf-on-action: oklch(14% 0.002 85);
+  --uf-shadow: 0 1px 2px oklch(0% 0 0 / 0.3), 0 10px 30px oklch(0% 0 0 / 0.35);
+}
+
+/* Fumadocs reads its own tokens: point them at the scale above. */
+:root,
+.dark {
+  --color-fd-background: var(--uf-page);
+  --color-fd-foreground: var(--uf-ink);
+  --color-fd-muted: var(--uf-canvas);
+  --color-fd-muted-foreground: var(--uf-muted);
+  --color-fd-popover: var(--uf-page);
+  --color-fd-popover-foreground: var(--uf-ink);
+  --color-fd-card: var(--uf-canvas);
+  --color-fd-card-foreground: var(--uf-ink);
+  --color-fd-border: transparent;
+  --color-fd-primary: var(--uf-action);
+  --color-fd-primary-foreground: var(--uf-on-action);
+  --color-fd-secondary: var(--uf-sunken);
+  --color-fd-secondary-foreground: var(--uf-ink);
+  --color-fd-accent: var(--uf-sunken);
+  --color-fd-accent-foreground: var(--uf-ink);
+  --color-fd-ring: var(--uf-action);
+  --color-fd-overlay: oklch(14% 0.002 85 / 0.35);
+}
+
+html {
+  font-family: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--uf-page);
+  color: var(--uf-ink);
+  font-feature-settings: "tnum" 0;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--uf-action) 28%, transparent);
+}
+
+/* ---- the wordmark ------------------------------------------------------------------------------------------------------ */
+
+.uf-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.uf-logo img {
+  height: 23px;
+  width: auto;
+}
+.uf-logo-dark {
+  display: none;
+}
+.dark .uf-logo-light {
+  display: none;
+}
+.dark .uf-logo-dark {
+  display: inline;
+}
+.uf-logo-name {
+  color: var(--uf-muted);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+/* ---- landing ----------------------------------------------------------------------------------------------------------- */
+
+.uf-home {
+  --gutter: clamp(20px, 5vw, 56px);
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: clamp(40px, 7vw, 96px) var(--gutter) 40px;
+}
+
+.uf-hero {
+  display: grid;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .uf-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  }
+}
+
+.uf-hero-copy h1 {
+  font-size: clamp(40px, 5.6vw, 68px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+.uf-hero-copy p {
+  margin-top: 22px;
+  max-width: 34em;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--uf-muted);
+  text-wrap: pretty;
+}
+
+.uf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 30px 0 22px;
+}
+
+.uf-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.uf-button-primary {
+  background: var(--uf-action);
+  color: var(--uf-on-action);
+}
+.uf-button-primary:hover {
+  background: var(--uf-action-hover);
+}
+.uf-button-quiet {
+  background: var(--uf-sunken);
+  color: var(--uf-ink);
+}
+.uf-button-quiet:hover {
+  background: var(--uf-sunken-2);
+}
+
+/* a command with its copy button */
+.uf-command {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 6px 6px 6px 16px;
+  border-radius: 14px;
+  background: var(--uf-canvas);
+  font-size: 14px;
+}
+.uf-command-prompt {
+  color: var(--uf-faint);
+  user-select: none;
+}
+.uf-command code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--uf-ink);
+  scrollbar-width: none;
+}
+.uf-command-hint {
+  display: none;
+  color: var(--uf-faint);
+  font-size: 13px;
+}
+@media (min-width: 1280px) {
+  .uf-command-hint {
+    display: inline;
+  }
+}
+
+.uf-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--uf-sunken);
+  color: var(--uf-ink-2);
+  font-size: 13px;
+  font-weight: 700;
+  flex: none;
+  transition: background-color 0.15s ease;
+}
+.uf-copy:hover {
+  background: var(--uf-sunken-2);
+}
+.uf-copy[data-copied="true"] {
+  color: var(--uf-action);
+}
+
+/* the picture beside the hero: a call, and the homes it returns */
+.uf-hero-picture {
+  display: grid;
+  gap: 14px;
+}
+.uf-picture-code {
+  border-radius: 22px;
+  background: var(--uf-canvas);
+  padding: 8px;
+}
+.uf-picture-code figure {
+  margin: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 13.5px;
+}
+.uf-picture-result {
+  border-radius: 22px;
+  background: var(--uf-raised);
+  box-shadow: var(--uf-shadow);
+  padding: 18px 20px 14px;
+  margin-inline: clamp(0px, 3vw, 36px) 0;
+}
+.uf-picture-result ul {
+  display: grid;
+  gap: 2px;
+}
+.uf-picture-result li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 11px 12px;
+  border-radius: 12px;
+}
+.uf-picture-result li:nth-child(odd) {
+  background: var(--uf-canvas);
+}
+.uf-home-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-home-facts {
+  color: var(--uf-muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.uf-home-rent {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.uf-home-apply {
+  color: var(--uf-action);
+  font-weight: 700;
+  font-size: 14px;
+}
+.uf-picture-result p {
+  margin: 12px 4px 0;
+  color: var(--uf-faint);
+  font-size: 13px;
+}
+.uf-picture-result code {
+  font-size: 12px;
+}
+@media (max-width: 560px) {
+  .uf-picture-result li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .uf-home-facts,
+  .uf-home-apply {
+    display: none;
+  }
+}
+
+/* sections */
+.uf-section {
+  margin-top: clamp(64px, 9vw, 120px);
+}
+.uf-section h2 {
+  font-size: clamp(28px, 3.4vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+
+.uf-cards {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.uf-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 150px;
+  padding: 24px 26px 26px;
+  border-radius: 22px;
+  background: var(--uf-canvas);
+  grid-column: span 6;
+  transition: background-color 0.15s ease;
+}
+.uf-card:hover {
+  background: var(--uf-sunken);
+}
+@media (min-width: 720px) {
+  .uf-card[data-size="wide"] {
+    grid-column: span 3;
+  }
+  .uf-card[data-size="third"] {
+    grid-column: span 2;
+  }
+}
+@media (min-width: 560px) and (max-width: 719px) {
+  .uf-card[data-size] {
+    grid-column: span 3;
+  }
+  .uf-card:last-child {
+    grid-column: span 6;
+  }
+}
+.uf-card-title {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.uf-card-text {
+  color: var(--uf-muted);
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 30em;
+  padding-right: 28px;
+}
+.uf-card-arrow {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  color: var(--uf-faint);
+}
+.uf-card:hover .uf-card-arrow {
+  color: var(--uf-ink);
+}
+
+.uf-capabilities {
+  display: grid;
+  gap: 40px 56px;
+}
+@media (min-width: 760px) {
+  .uf-capabilities {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.uf-capability h3,
+.uf-package h3 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+}
+.uf-capability p {
+  margin-top: 8px;
+  color: var(--uf-muted);
+  line-height: 1.6;
+  max-width: 34em;
+}
+.uf-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--uf-action);
+  font-weight: 700;
+}
+.uf-link:hover {
+  color: var(--uf-action-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.uf-packages {
+  display: grid;
+  gap: 10px;
+}
+.uf-package {
+  display: grid;
+  gap: 16px;
+  align-items: center;
+  padding: 20px 22px;
+  border-radius: 20px;
+  background: var(--uf-canvas);
+}
+@media (min-width: 900px) {
+  .uf-package {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.uf-package p {
+  margin-top: 4px;
+  color: var(--uf-muted);
+  font-size: 15px;
+}
+.uf-package .uf-command {
+  background: var(--uf-page);
+}
+
+.uf-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: clamp(64px, 9vw, 120px);
+  padding-top: 8px;
+  color: var(--uf-muted);
+  font-size: 14px;
+}
+.uf-footer span {
+  color: var(--uf-ink);
+  font-weight: 700;
+}
+.uf-footer a:hover {
+  color: var(--uf-ink);
+}
+
+/* ---- code ------------------------------------------------------------------------------------------------------------- */
+
+:root {
+  --uf-code-foreground: var(--uf-ink-2);
+  --uf-code-background: transparent;
+  --uf-code-token-constant: var(--uf-ink);
+  --uf-code-token-string: var(--uf-action);
+  --uf-code-token-comment: var(--uf-faint);
+  --uf-code-token-keyword: var(--uf-muted);
+  --uf-code-token-parameter: var(--uf-ink-2);
+  --uf-code-token-function: var(--uf-ink);
+  --uf-code-token-string-expression: var(--uf-action);
+  --uf-code-token-punctuation: var(--uf-faint);
+  --uf-code-token-link: var(--uf-action);
+}
+
+/* ---- docs chrome: tonal, no lines ------------------------------------------------------------------------------------- */
+
+:root {
+  --uf-raised: var(--uf-page);
+  --uf-raised-shadow: 0 1px 2px oklch(19% 0.004 85 / 0.08), 0 2px 8px oklch(19% 0.004 85 / 0.05);
+}
+.dark {
+  --uf-raised: var(--uf-sunken);
+  --uf-raised-shadow: none;
+}
+
+/* The sidebar is the canvas; the page you are on is lifted out of it. */
+#nd-sidebar a[data-active="true"],
+#nd-sidebar button[data-active="true"] {
+  background: var(--uf-raised);
+  color: var(--uf-ink);
+  font-weight: 700;
+  box-shadow: var(--uf-raised-shadow);
+}
+#nd-sidebar a {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+#nd-sidebar a:hover:not([data-active="true"]) {
+  background: var(--uf-sunken);
+  color: var(--uf-ink);
+}
+
+/* Method labels: one tone, so only the accent stands out. */
+span.font-mono[class*="text-green-"],
+span.font-mono[class*="text-blue-"],
+span.font-mono[class*="text-yellow-"],
+span.font-mono[class*="text-orange-"],
+span.font-mono[class*="text-red-"] {
+  color: var(--uf-muted);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+[class*="bg-current/10"] {
+  background: var(--uf-sunken);
+}
+
+/* Tables: a tonal block with alternate rows, never ruled lines. */
+.prose table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 0.9375rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--uf-canvas);
+}
+.prose thead th {
+  background: var(--uf-sunken);
+  color: var(--uf-ink-2);
+  font-weight: 700;
+  text-align: start;
+  padding: 10px 16px;
+}
+.prose tbody td {
+  padding: 10px 16px;
+  vertical-align: top;
+}
+.prose tbody tr:nth-child(even) td {
+  background: color-mix(in oklch, var(--uf-sunken) 55%, transparent);
+}
+.prose :not(pre) > code {
+  background: var(--uf-sunken);
+  border-radius: 6px;
+}
+.prose table code {
+  background: var(--uf-page);
+}
+.prose tbody tr:nth-child(even) code {
+  background: var(--uf-page);
+}
+
+/* Code blocks: a canvas well, no outline. */
+figure.shiki,
+[class*="bg-fd-card"] > pre {
+  box-shadow: none;
+}
+
+/* Links are plain text in the one accent; the arrow cards and headings' anchors keep their own look. */
+.prose a:not([data-card]):not(.not-prose) {
+  color: var(--uf-action);
+  font-weight: 500;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklch, var(--uf-action) 35%, transparent);
+  text-underline-offset: 3px;
+}
+.prose a:not([data-card]):hover {
+  color: var(--uf-action-hover);
+  text-decoration-color: currentColor;
+}
+.prose h1 a,
+.prose h2 a,
+.prose h3 a,
+.prose h4 a {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+/* On this page: the current heading is ink, not a second blue. */
+#nd-toc a[data-active="true"] {
+  color: var(--uf-ink);
+  font-weight: 700;
+}
+
+/* Grid children may shrink below their content, so a wide code line scrolls inside its block instead of widening the page. */
+.uf-hero > *,
+.uf-hero-picture > *,
+.uf-package > *,
+.uf-cards > *,
+.uf-capabilities > * {
+  min-width: 0;
+}
+.uf-picture-code figure,
+.uf-picture-code pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* A wide table scrolls on its own on a phone, and does not widen the page. */
+@media (max-width: 767px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+}
+
+/* Event names are long single words: let a heading break them rather than widen the page. */
+.prose h2,
+.prose h3,
+.prose h4 {
+  overflow-wrap: anywhere;
+}
+.prose h2 a,
+.prose h3 a,
+.prose h4 a {
+  min-width: 0;
+}

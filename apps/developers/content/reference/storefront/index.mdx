@@ -1,0 +1,16 @@
+---
+title: Storefront API
+description: Public reads of your site and homes, and the inquiry and tour endpoints.
+---
+
+The Storefront API is what your own website reads. It returns your published homes, your site's brand and hosted URLs, and it
+takes inquiries and tour requests. It never returns private notes, internal ids, owner data or tenant data.
+
+Every operation but [Resolve a host](/reference/storefront/site/resolve-host) needs your **publishable key** in the `X-Unitfield-Key`
+header. A key looks like `pk_live_…` or `pk_test_…`, is created in **Website > Developers**, and is public by design.
+
+- On a server, no `Origin` header is sent, so the key alone is enough.
+- In a browser, the request's origin must be allowed on the key. The API answers `401` for a missing, revoked or unknown key, and for a disallowed origin, in the same way.
+
+With the SDK: `createStorefrontClient({ publishableKey })`, then `storefront.site.get()`, `storefront.listings.list()` and the rest.
+The [quickstart](/docs/quickstart) walks through it.

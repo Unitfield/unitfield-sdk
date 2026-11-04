@@ -1,0 +1,13 @@
+---
+title: Installed apps API
+description: What an installed app calls with its client credentials, within the scopes its installation was granted.
+---
+
+An installed app calls this API with a token for its installation, obtained with the OAuth **client credentials** grant. Every
+operation needs a scope that the installation's grant includes, and an installed app only sees what its grant allows.
+
+The API has a production root, `https://api.unitfield.com`, and a sandbox, `https://api-sandbox.unitfield.com`.
+
+<Scopes surface="apps" />
+
+With the SDK: `AppsClient`, and `createClientCredentialsTokenProvider` from `@unitfield/sdk/server`.
