@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRightIcon } from "@unitfield/ui/icons";
 import { ServerCodeBlock } from "fumadocs-ui/components/codeblock.rsc";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import Link from "next/link";
@@ -99,7 +99,7 @@ export default function Home() {
               <Link key={card.href} href={card.href} className="uf-card" data-size={card.size}>
                 <span className="uf-card-title">{card.title}</span>
                 <span className="uf-card-text">{card.text}</span>
-                <ArrowRight aria-hidden className="uf-card-arrow" size={18} />
+                <ArrowRightIcon aria-hidden className="uf-card-arrow" size={18} />
               </Link>
             ))}
           </div>

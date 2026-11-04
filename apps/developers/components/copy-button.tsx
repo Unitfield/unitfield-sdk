@@ -1,5 +1,5 @@
 "use client";
-import { Check, Copy } from "lucide-react";
+import { CheckIcon, CopyIcon } from "@unitfield/ui/icons";
 import { useState } from "react";
 
 /** Copies `text`, and says so for a moment. Falls back quietly when the clipboard is not available. */
@@ -21,7 +21,7 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
         }
       }}
     >
-      {copied ? <Check aria-hidden size={15} /> : <Copy aria-hidden size={15} />}
+      {copied ? <CheckIcon aria-hidden size={15} /> : <CopyIcon aria-hidden size={15} />}
       <span>{copied ? "Copied" : label}</span>
     </button>
   );

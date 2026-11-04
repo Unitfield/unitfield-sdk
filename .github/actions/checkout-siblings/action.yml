@@ -1,0 +1,76 @@
+name: Check out pinned siblings
+description: >-
+  Checks out the private sibling repository listed in unitfield-siblings.json at its pinned commit, next to the current repository, so
+  the developer site's `link:` dependency on @unitfield/ui resolves exactly as it does on a developer machine. The current repository
+  must already be checked out into <workspace>/<repository name>.
+
+inputs:
+  token:
+    description: >-
+      Token with read access to the sibling repository (the UNITFIELD_SIBLINGS_TOKEN secret). GITHUB_TOKEN cannot read other private
+      repositories, and a composite action cannot read secrets itself, so the caller passes it in.
+    required: true
+
+outputs:
+  repo-dir:
+    description: Absolute path of the current repository's checkout.
+    value: ${{ steps.pins.outputs.repo_dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Read sibling pins
+      id: pins
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        SIBLINGS_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        # <repo>/.github/actions/checkout-siblings -> <repo>
+        repo_dir="$(cd "$ACTION_PATH/../../.." && pwd -P)"
+        pins="$repo_dir/unitfield-siblings.json"
+
+        if [ -z "$SIBLINGS_TOKEN" ]; then
+          echo "::error::UNITFIELD_SIBLINGS_TOKEN is empty. Add it as an Actions secret; pull requests from forks never receive it."
+          exit 1
+        fi
+        [ -f "$pins" ] || { echo "::error::$pins is missing"; exit 1; }
+
+        # Every pin must be an exact 40-character lowercase commit sha, never a branch or tag.
+        jq -e 'type == "object" and all(to_entries[]; (.value | type == "string") and (.value | test("^[0-9a-f]{40}$")))' "$pins" >/dev/null ||
+          { echo "::error::unitfield-siblings.json must map Owner/repository to a full 40-character lowercase commit sha"; exit 1; }
+
+        # Only this repository can be a sibling.
+        while IFS= read -r slug; do
+          [ "$slug" = "Unitfield/unitfield-dashboard" ] ||
+            { echo "::error::unitfield-siblings.json pins $slug, which this action does not know how to check out"; exit 1; }
+        done < <(jq -r 'keys[]' "$pins")
+
+        {
+          echo "repo_dir=$repo_dir"
+          echo "unitfield_dashboard=$(jq -r '."Unitfield/unitfield-dashboard" // ""' "$pins")"
+        } >> "$GITHUB_OUTPUT"
+
+    # persist-credentials: false keeps the token out of the sibling's .git/config; nothing later needs to push or fetch from it.
+    - name: Check out unitfield-dashboard at its pin
+      if: steps.pins.outputs.unitfield_dashboard != ''
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      with:
+        repository: Unitfield/unitfield-dashboard
+        ref: ${{ steps.pins.outputs.unitfield_dashboard }}
+        path: unitfield-dashboard
+        token: ${{ inputs.token }}
+        persist-credentials: false
+
+    - name: Confirm the sibling is at its pin
+      shell: bash
+      env:
+        REPO_DIR: ${{ steps.pins.outputs.repo_dir }}
+      run: |
+        set -euo pipefail
+        while IFS=$'\t' read -r slug sha; do
+          actual="$(git -C "$REPO_DIR/../${slug#*/}" rev-parse HEAD)"
+          [ "$actual" = "$sha" ] || { echo "::error::${slug#*/} is at $actual, expected $sha"; exit 1; }
+          echo "${slug#*/} @ $sha"
+        done < <(jq -r 'to_entries[] | [.key, .value] | @tsv' "$REPO_DIR/unitfield-siblings.json")

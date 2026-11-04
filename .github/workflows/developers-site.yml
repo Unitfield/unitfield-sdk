@@ -1,0 +1,154 @@
+name: Developer site
+
+# Builds apps/developers (developers.unitfield.com) and, from main, deploys it to Cloudflare Pages.
+#
+# The site draws its icons from @unitfield/ui, which lives in a private Unitfield repository, so it needs that repository checked out next
+# to this one at the commit in unitfield-siblings.json. That is why it is not part of the root pnpm workspace, `pnpm build` or ci.yml:
+# the SDK packages build, test and release for everyone, forks included, without any secret. This workflow is the only place the site is
+# built, and the rest of this file is what it takes to turn it on.
+#
+# Turning it on (repository owner, once):
+#   1. Settings > Secrets and variables > Actions > Secrets: add UNITFIELD_SIBLINGS_TOKEN, a token that can read the private
+#      Unitfield/unitfield-dashboard repository (contents: read, nothing else).
+#   2. Settings > Secrets and variables > Actions > Variables: add DEVELOPERS_SITE_ENABLED = true.
+# Until both exist the jobs below are skipped, not failed. A pull request from a fork never runs them and never sees the secret.
+#
+# Deploying to Cloudflare Pages (a later step; the build job above works without it):
+#   Pages' own Git integration cannot read the private sibling, so the site is built here and the finished out/ folder is uploaded with
+#   `wrangler pages deploy`. Create a Pages project of the "Direct Upload" kind, then
+#   3. Settings > Environments: create `developers-site`, and put these in it:
+#        secrets   CLOUDFLARE_API_TOKEN (permission: Account > Cloudflare Pages > Edit), CLOUDFLARE_ACCOUNT_ID
+#        variables CLOUDFLARE_PAGES_PROJECT (the project's name)
+#   4. Settings > Variables: add DEVELOPERS_SITE_DEPLOY = true. Each push to main that changes the site then deploys it.
+#   Point developers.unitfield.com at the Pages project in Cloudflare (custom domain), not here.
+#
+# Moving the icons forward: `node scripts/siblings/bump.mjs` (see apps/developers/README.md) moves the pin; commit unitfield-siblings.json.
+
+on:
+  pull_request:
+    paths:
+      - apps/developers/**
+      - docs/**
+      - packages/sdk/openapi/**
+      - scripts/public-api-filter.json
+      - unitfield-siblings.json
+      - .github/actions/checkout-siblings/**
+      - .github/workflows/developers-site.yml
+  push:
+    branches:
+      - main
+    paths:
+      - apps/developers/**
+      - docs/**
+      - packages/sdk/openapi/**
+      - scripts/public-api-filter.json
+      - unitfield-siblings.json
+      - .github/actions/checkout-siblings/**
+      - .github/workflows/developers-site.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "24.14.0" # .nvmrc
+  PNPM_VERSION: "11.20.0" # apps/developers/package.json: packageManager (the dashboard pins the same release)
+  NEXT_TELEMETRY_DISABLED: "1"
+  WRANGLER_VERSION: "4.151.2"
+
+concurrency:
+  group: developers-site-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  build:
+    name: Build and verify
+    # Off until the owner adds the secret and the variable; and never for a pull request from a fork.
+    if: >-
+      vars.DEVELOPERS_SITE_ENABLED == 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # This repository and its sibling sit side by side under the workspace, as they do on a developer machine.
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/unitfield-sdk/apps/developers
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          path: unitfield-sdk
+          persist-credentials: false
+      - name: Check out the pinned sibling
+        uses: ./unitfield-sdk/.github/actions/checkout-siblings
+        with:
+          token: ${{ secrets.UNITFIELD_SIBLINGS_TOKEN }}
+      - name: Verify the pin is a full commit SHA
+        working-directory: ${{ github.workspace }}/unitfield-sdk
+        run: node scripts/siblings/bump.mjs --check
+      - name: Set up pnpm
+        working-directory: ${{ github.workspace }}
+        run: |
+          corepack_dir="${RUNNER_TEMP}/corepack"
+          mkdir -p "$corepack_dir"
+          corepack enable pnpm --install-directory "$corepack_dir"
+          corepack install --global "pnpm@${PNPM_VERSION}"
+          echo "$corepack_dir" >> "$GITHUB_PATH"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        env:
+          COREPACK_ENABLE_PROJECT_SPEC: "0"
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          # Nothing sits at the workspace root, so name the lockfiles of both checkouts.
+          cache-dependency-path: |
+            unitfield-sdk/apps/developers/pnpm-lock.yaml
+            unitfield-dashboard/pnpm-lock.yaml
+      # A `link:` dependency does not install its target's own dependencies: they resolve from the target's checkout. Install the UI
+      # package's dependencies there (from the dashboard's lockfile), then the site's.
+      - name: Install the UI package's dependencies
+        working-directory: ${{ github.workspace }}/unitfield-dashboard
+        run: pnpm install --frozen-lockfile --ignore-scripts --filter @unitfield/ui
+      - name: Install the site's dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      # `next build` writes the static export to out/ and then runs scripts/verify-output.mjs: no unpublished API in the export, every
+      # internal link resolves, the required pages exist, and no icon of another set.
+      - name: Build and verify the export
+        run: pnpm build
+      - name: Keep the export for the deploy job
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: developers-site
+          path: unitfield-sdk/apps/developers/out
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Cloudflare Pages
+    needs: build
+    # Only from main, and only once the owner has set up the Pages project (steps 3 and 4 above).
+    if: >-
+      vars.DEVELOPERS_SITE_ENABLED == 'true' &&
+      vars.DEVELOPERS_SITE_DEPLOY == 'true' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: developers-site
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Fetch the verified export
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: developers-site
+          path: out
+      - name: Deploy with wrangler
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        run: npx --yes "wrangler@${WRANGLER_VERSION}" pages deploy out --project-name "$PROJECT" --branch main --commit-hash "$GITHUB_SHA"

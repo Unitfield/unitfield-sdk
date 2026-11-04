@@ -1,0 +1,10 @@
+# The developer site is its own pnpm project, not a member of the repository's workspace. It links @unitfield/ui from the private
+# dashboard repository, which exists only where the siblings are checked out next to this repository (unitfield-siblings.json,
+# .github/workflows/developers-site.yml), so it must never take part in the root install that every contributor and fork runs.
+packages:
+  - "."
+
+strictDepBuilds: true
+
+allowBuilds:
+  esbuild: true

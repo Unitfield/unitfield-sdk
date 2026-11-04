@@ -2,7 +2,8 @@
 // Checks the static export in out/ before anything deploys it:
 //   - no word of an API this site never publishes (scripts/public-api-filter.json, forbiddenInOutput);
 //   - every internal link points at a file the export has;
-//   - the pages that must exist do.
+//   - the pages that must exist do;
+//   - no icon of another set: every icon is a Unitfield icon (lib/fumadocs-icons.tsx), so the export holds no Lucide markup or code.
 import { readdir, readFile, stat } from "node:fs/promises";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,6 +12,7 @@ const app = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(app, "out");
 const FORBIDDEN = new RegExp(JSON.parse(await readFile(join(app, "../../scripts/public-api-filter.json"), "utf8")).forbiddenInOutput, "i");
 const TEXT = new Set([".html", ".txt", ".js", ".json", ".css", ".xml", ""]);
+const OTHER_ICON_SET = /lucide/i;
 const MUST_EXIST = ["index.html", "docs/index.html", "docs/quickstart/index.html", "docs/webhooks/index.html", "reference/index.html", "reference/webhook-events/index.html", "reference/storefront/listings/list-listings/index.html", "api/search", "404.html", "robots.txt", "sitemap.xml"];
 
 async function walk(directory) {
@@ -46,6 +48,7 @@ for (const file of files) {
   const text = await readFile(file, "utf8");
   const leak = FORBIDDEN.exec(text);
   if (leak) fail(`${name} mentions "${leak[0]}", which this site never publishes.`);
+  if (OTHER_ICON_SET.test(text)) fail(`${name} holds an icon of another set (Lucide): every icon must be a Unitfield icon (lib/fumadocs-icons.tsx).`);
   if (!name.endsWith(".html")) continue;
   pages++;
   if (/^reference\/(storefront|customer|resident|apps|platform)\/[^/]+\/[^/]+\/index\.html$/.test(name)) operations++;
@@ -64,4 +67,4 @@ if (failures > 0) {
   console.error(`\n${failures} problem${failures === 1 ? "" : "s"} in the export.`);
   process.exit(1);
 }
-console.log(`Export is clean: ${pages} pages (${operations} API operations), links resolve, nothing unpublished is mentioned.`);
+console.log(`Export is clean: ${pages} pages (${operations} API operations), links resolve, nothing unpublished is mentioned, only Unitfield icons.`);
