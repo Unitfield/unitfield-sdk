@@ -34,6 +34,7 @@ other values in `.env.local` (git ignores it) and set them in your host's enviro
 | `app/api/unitfield/webhook/route.ts` | Optional: drops the cached API reads when Unitfield tells you something changed. |
 | `lib/storefront.ts` | The SDK client. Reads are cached for 60 seconds under one tag. |
 | `lib/session.ts` | The sealed httpOnly cookie that holds the customer's tokens. |
+| `app/api/sms-consent/route.ts` | The text-message opt-in under the form's phone field: shows the API's consent text and records a ticked box. |
 | `components/` | The header, footer, listing card and inquiry form. |
 
 The listing markup uses the headless parts of `@unitfield/react` (`ListingGrid`, `ListingPrice`, `ApplyButton`, ...), which
@@ -75,6 +76,14 @@ one) never sends anything.
 Without a site key from the API, a development build sends a placeholder token (accepted only by an API that has Turnstile
 switched off) and a production build shows your contact details instead of the form. `TURNSTILE_SITE_KEY` stands in for an API
 that sends no key.
+
+### Text-message opt-in
+
+Once a visitor types a US or Canadian number, the form shows an unchecked box with the consent text the API serves for your
+organization (name filled in, versioned) and its links. The text is never in your code; when the API has none (texting is not
+available for you) the box stays hidden. After the inquiry is sent, a ticked box is recorded through `app/api/sms-consent`, a route
+of your own that calls the API with the SDK (the browser cannot: CORS covers the storefront routes only). A failed opt-in never
+fails the inquiry. The API counts these calls by your server's address, so keep the route as it is.
 
 ## Webhooks
 

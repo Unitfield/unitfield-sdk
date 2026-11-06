@@ -134,6 +134,29 @@ export type InquiryInput = {
 /** The `202` answer. It is the same for every email, whether or not the Turnstile check passed. */
 export type InquiryAccepted = Wire<Schemas["StorefrontInquiryAccepted"]>;
 
+/**
+ * `GET /api/v1/notifications/sms/consent/disclosure`: the exact text to show next to an unchecked text-message opt-in, with the
+ * organization's name already in it. `version` names this wording; send it back with `smsConsent.record`. Never write your own copy.
+ */
+export type SmsDisclosure = { version: string; text: string; links: { label: string; url: string }[] };
+
+/** Body of `POST /api/v1/notifications/sms/consent/public`. */
+export type SmsConsentInput = {
+  /** The organization's slug (`site.brand.slug`) or id. */
+  org: string;
+  /** The number the visitor typed. US and Canadian numbers only; anything else is a `ValidationError`. */
+  phone: string;
+  /** `version` of the {@link SmsDisclosure} the visitor saw next to the box they ticked. */
+  disclosureVersion: string;
+  /** Where the box was: `public_inquiry` (default) or `public_application`. */
+  source?: "public_inquiry" | "public_application";
+  email?: string;
+  note?: string;
+};
+
+/** What recording the opt-in did. `requiresStartKeyword`: the carrier blocked this number after a STOP, and only the person texting START lifts that. */
+export type SmsConsentResult = { optedIn: boolean; optedOut: boolean; canText: boolean; requiresStartKeyword: boolean };
+
 /*
  * Tours (`GET /tour-windows`, `POST /tours/view`, `POST /tours/answer`, `GET /tours/ics`). The shapes are the generated ones. The
  * document lists the allowed values of `status`, the window keys, `weekday` and the answer action as enums; they are named here as

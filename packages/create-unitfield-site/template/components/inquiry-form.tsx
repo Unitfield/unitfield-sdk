@@ -2,7 +2,7 @@
 
 import { useUnitfield } from "@unitfield/react";
 import { isUnitfieldError, RateLimitError, ValidationError } from "@unitfield/sdk";
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { Turnstile } from "./turnstile";
 
 // How the form gets the anti-bot token the API requires (the mode is chosen in lib/inquiry.ts):
@@ -16,6 +16,17 @@ type Status = { state: "idle" } | { state: "sending" } | { state: "sent" } | { s
 
 const PLACEHOLDER_TOKEN = "turnstile-not-configured";
 
+// Text-message opt-in. The consent text comes from the API (through app/api/sms-consent), never from this file; if it is not there, the
+// checkbox stays hidden and the form works as before. Only US and Canadian numbers can be texted.
+type Disclosure = { version: string; text: string; links: { label: string; url: string }[] };
+const SMS_ROUTE = "/api/sms-consent";
+
+function isUsPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  const national = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  return /^[2-9]\d{2}[2-9]\d{6}$/.test(national);
+}
+
 export function InquiryForm({ mode, listingPublicId, listingTitle }: { mode: InquiryMode; listingPublicId?: string; listingTitle?: string }) {
   const { client } = useUnitfield();
   const id = useId();
@@ -23,6 +34,23 @@ export function InquiryForm({ mode, listingPublicId, listingTitle }: { mode: Inq
   const [kind, setKind] = useState<"contact" | "tour">(listingPublicId ? "tour" : "contact");
   const [token, setToken] = useState<string | null>(null);
   const [challenge, setChallenge] = useState(0);
+  const [phone, setPhone] = useState("");
+  const [disclosure, setDisclosure] = useState<Disclosure | null | undefined>(undefined);
+  const [textMe, setTextMe] = useState(false);
+  const canText = isUsPhone(phone);
+
+  useEffect(() => {
+    if (!canText || disclosure !== undefined) return;
+    let cancelled = false;
+    fetch(SMS_ROUTE, { headers: { accept: "application/json" } })
+      .then((response) => (response.ok ? (response.json() as Promise<Disclosure>) : null))
+      .then((body) => !cancelled && setDisclosure(body && body.version && body.text ? body : null))
+      .catch(() => !cancelled && setDisclosure(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [canText, disclosure]);
+  const optIn = canText && disclosure ? disclosure : null;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,6 +74,14 @@ export function InquiryForm({ mode, listingPublicId, listingTitle }: { mode: Inq
         ...(kind === "tour" && preferred ? { preferredTimes: [preferred] } : {}),
         turnstileToken,
       });
+      if (optIn && textMe && text("phone")) {
+        // The opt-in is its own record: if it fails the inquiry still stands.
+        await fetch(SMS_ROUTE, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ phone: text("phone"), disclosureVersion: optIn.version, email: text("email") }),
+        }).catch((error: unknown) => console.error("sms consent failed", error));
+      }
       setStatus({ state: "sent" });
     } catch (error) {
       // The API answers 202 for every accepted request, so an error here means the request itself was refused.
@@ -91,7 +127,25 @@ export function InquiryForm({ mode, listingPublicId, listingTitle }: { mode: Inq
       <label htmlFor={`${id}-email`}>Email</label>
       <input id={`${id}-email`} name="email" type="email" autoComplete="email" required maxLength={254} />
       <label htmlFor={`${id}-phone`}>Phone (optional)</label>
-      <input id={`${id}-phone`} name="phone" type="tel" autoComplete="tel" maxLength={40} />
+      <input id={`${id}-phone`} name="phone" type="tel" autoComplete="tel" maxLength={40} value={phone} onChange={(event) => setPhone(event.target.value)} />
+      {optIn ? (
+        <div className="sms-optin">
+          <input id={`${id}-sms`} type="checkbox" checked={textMe} onChange={(event) => setTextMe(event.target.checked)} />
+          <label htmlFor={`${id}-sms`}>{optIn.text}</label>
+          {optIn.links.length ? (
+            <p>
+              {optIn.links.map((link, index) => (
+                <span key={link.url}>
+                  {index ? " · " : null}
+                  <a href={link.url} target="_blank" rel="noopener noreferrer">
+                    {link.label}
+                  </a>
+                </span>
+              ))}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       {kind === "tour" ? (
         <>
           <label htmlFor={`${id}-preferred`}>Preferred time (optional)</label>
