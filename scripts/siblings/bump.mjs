@@ -4,11 +4,11 @@
 // The Unitfield frontends depend on each other through `link:` dependencies that only resolve when the repositories sit side by
 // side. CI and image builds therefore check the siblings out at the exact commits pinned in unitfield-siblings.json.
 //
-//   node scripts/siblings/bump.mjs                       every pin -> the head of the sibling's develop branch
+//   node scripts/siblings/bump.mjs                       every pin -> the head of the sibling's main branch
 //   node scripts/siblings/bump.mjs unitfield-dashboard   only that sibling (a bare repository name or Owner/name)
 //   node scripts/siblings/bump.mjs unitfield-dashboard=<40-character sha>   that sibling -> exactly this commit
 //   node scripts/siblings/bump.mjs --sha <40-character sha>                 the only pinned sibling -> exactly this commit
-//   node scripts/siblings/bump.mjs --ref <branch>        take the head of another branch instead of develop
+//   node scripts/siblings/bump.mjs --ref <branch>        take the head of another branch instead of main
 //   node scripts/siblings/bump.mjs --dry-run             show what would change; write nothing
 //   node scripts/siblings/bump.mjs --check               offline: fail unless every pin is a full 40-character lowercase sha
 //   node scripts/siblings/bump.mjs --check --remote      also fail unless every pinned commit exists on the remote
@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 const PIN_FILE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../unitfield-siblings.json");
 const FULL_SHA = /^[0-9a-f]{40}$/;
 const SLUG = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-const DEFAULT_REF = "develop";
+const DEFAULT_REF = "main";
 const GIT_ENV = { ...process.env, GIT_TERMINAL_PROMPT: "0" };
 
 function fail(message) {
