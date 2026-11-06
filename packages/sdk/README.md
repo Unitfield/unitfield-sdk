@@ -29,10 +29,24 @@ await storefront.inquiries.create({ kind: "contact", name, email, message, turns
 ```
 
 Methods: `hosts.resolve`, `site.get`, `pages.get`, `listings.list|iterate|get`,
-`properties.list|iterate|get`, `inquiries.create`, `tours.windows|view|answer|icsUrl`. `listings.list` also filters by
+`properties.list|iterate|get`, `inquiries.create`, `smsConsent.disclosure|record`, `tours.windows|view|answer|icsUrl`. `listings.list` also filters by
 `unitPublicKey` (the key in `/apply/{unitPublicKey}`). A preview token
 (`storefront.withPreview(token)`) reads the draft and bypasses caches. Public reads
 set no `cache` mode so the HTTP cache (or a framework's, via `fetchOptions`) applies.
+
+## Text-message opt-in
+
+A form that asks for a phone number can offer an unchecked opt-in to texts. Show the API's own consent text (it carries the operator's
+name and a version), and record the choice only when the box was ticked, after the inquiry went through. A failed `record` must not fail the inquiry.
+
+```ts
+const disclosure = await storefront.smsConsent.disclosure(site.brand.slug); // { version, text, links }; NotFoundError: texting is off, hide the checkbox
+// ... visitor ticks the box under the phone field, you send the inquiry, then:
+await storefront.smsConsent.record({ org: site.brand.slug, phone, disclosureVersion: disclosure.version, email });
+```
+
+Both calls are anonymous (no key is sent) and US and Canadian numbers only. The API allows browser origins on the storefront routes only, so
+call them from your server: the starter's `app/api/sms-consent` route does, and its inquiry form talks to that route.
 
 ## Tours
 

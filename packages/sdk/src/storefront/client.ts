@@ -15,6 +15,9 @@ import type {
   PropertyDetail,
   PropertyPage,
   PropertyQuery,
+  SmsConsentInput,
+  SmsConsentResult,
+  SmsDisclosure,
   StorefrontPage,
   StorefrontSite,
   TourAnswerAction,
@@ -60,6 +63,7 @@ export class StorefrontClient extends ApiClient {
   readonly listings: StorefrontListings;
   readonly properties: StorefrontProperties;
   readonly inquiries: StorefrontInquiries;
+  readonly smsConsent: StorefrontSmsConsent;
   readonly tours: StorefrontTours;
   readonly #options: StorefrontClientOptions;
 
@@ -82,6 +86,7 @@ export class StorefrontClient extends ApiClient {
     this.listings = new StorefrontListings(this.http);
     this.properties = new StorefrontProperties(this.http);
     this.inquiries = new StorefrontInquiries(this.http);
+    this.smsConsent = new StorefrontSmsConsent(this.http);
     this.tours = new StorefrontTours(this.http, this.baseUrl);
   }
 
@@ -231,6 +236,58 @@ class StorefrontInquiries {
       body: inquiryBody(input),
     });
   }
+}
+
+const SMS_CONSENT = "/api/v1/notifications/sms/consent";
+
+/**
+ * Text-message opt-in for a public form. Both calls are anonymous: no key or cookie is sent, so they work from a server. A browser on your
+ * own origin is blocked by CORS (the API allows your key's origins on `/api/storefront/v1` only), so post the visitor's choice to a route of
+ * your own and call `record` from there (the starter does).
+ */
+class StorefrontSmsConsent {
+  readonly #http: Transport;
+  constructor(http: Transport) {
+    this.#http = http;
+  }
+
+  /** The consent text for an organization. A `NotFoundError` means texting is not available for it: hide the checkbox. */
+  async disclosure(org: string, options: RequestOptions = {}): Promise<SmsDisclosure> {
+    return this.#http.request<SmsDisclosure>({ ...options, path: `${SMS_CONSENT}/disclosure`, query: { org: orgOf(org) }, anonymous: true });
+  }
+
+  /**
+   * Records that the visitor ticked the opt-in. Call it only when the box was checked, after the inquiry is sent. A failure must not fail
+   * the inquiry. Rate limits are a `RateLimitError`; an invalid number or an unknown `disclosureVersion` is a `ValidationError`.
+   */
+  async record(input: SmsConsentInput, options: MutationOptions = {}): Promise<SmsConsentResult> {
+    const org = orgOf(input?.org);
+    for (const field of ["phone", "disclosureVersion"] as const) {
+      if (typeof input[field] !== "string" || !input[field].trim()) throw new TypeError(`${field} must be a non-empty string.`);
+    }
+    const source = input.source ?? "public_inquiry";
+    if (source !== "public_inquiry" && source !== "public_application") throw new TypeError('source must be "public_inquiry" or "public_application".');
+    return this.#http.request<SmsConsentResult>({
+      ...options,
+      method: "POST",
+      path: `${SMS_CONSENT}/public`,
+      anonymous: true,
+      fetchOptions: { ...options.fetchOptions, cache: "no-store" },
+      body: {
+        org,
+        phone: input.phone.trim(),
+        source,
+        disclosureVersion: input.disclosureVersion.trim(),
+        ...(input.email?.trim() ? { email: input.email.trim() } : {}),
+        ...(input.note?.trim() ? { note: input.note.trim() } : {}),
+      },
+    });
+  }
+}
+
+function orgOf(org: unknown): string {
+  if (typeof org !== "string" || !org.trim() || /\s/.test(org.trim())) throw new TypeError("org must be the organization's slug or id.");
+  return org.trim();
 }
 
 const MAX_PICKS = 5;

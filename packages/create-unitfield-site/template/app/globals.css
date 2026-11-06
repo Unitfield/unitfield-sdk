@@ -372,6 +372,25 @@ textarea {
   color: var(--text);
   font: inherit;
 }
+.sms-optin {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  gap: 0.25rem 0.625rem;
+  align-items: start;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.sms-optin label {
+  font-weight: 400;
+  font-size: inherit;
+}
+.sms-optin p {
+  grid-column: 2;
+  margin: 0;
+}
+.sms-optin input {
+  margin: 0.2rem 0 0;
+}
 fieldset.choice {
   border: 0;
   padding: 0;

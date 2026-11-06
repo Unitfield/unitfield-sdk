@@ -357,3 +357,35 @@ test("tours.icsUrl builds the calendar address on the API origin, encoded", () =
   assert.equal(client.tours.icsUrl("a+b/c="), "https://api.unitfield.test/gateway/api/storefront/v1/tours/ics?token=a%2Bb%2Fc%3D");
   assert.throws(() => client.tours.icsUrl(" "), /token/);
 });
+
+test("sms consent: the disclosure is read and the opt-in recorded anonymously, with the documented body", async () => {
+  const disclosure = { version: "sms-consent-2026-11-07", text: "Text me updates from Acme.", links: [{ label: "Privacy Policy", url: "https://unitfield.com/legal/privacy" }] };
+  const { calls, fetch } = recorder((call) =>
+    call.method === "GET" ? Response.json(disclosure) : Response.json({ optedIn: true, optedOut: false, canText: true, requiresStartKeyword: false }),
+  );
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch, headers: { authorization: "Bearer leaked" } });
+  assert.deepEqual(await client.smsConsent.disclosure(" acme "), disclosure);
+  const result = await client.smsConsent.record({ org: "acme", phone: " (619) 555-0142 ", disclosureVersion: disclosure.version, email: "ada@example.test" });
+  assert.equal(result.canText, true);
+  assert.equal(calls[0].url.pathname, "/api/v1/notifications/sms/consent/disclosure");
+  assert.equal(calls[0].url.searchParams.get("org"), "acme");
+  assert.equal(calls[1].method, "POST");
+  assert.equal(calls[1].url.pathname, "/api/v1/notifications/sms/consent/public");
+  assert.deepEqual(JSON.parse(String(calls[1].init.body)), { org: "acme", phone: "(619) 555-0142", source: "public_inquiry", disclosureVersion: disclosure.version, email: "ada@example.test" });
+  for (const call of calls) {
+    assert.equal(call.headers.get("x-unitfield-key"), null, "anonymous: no key");
+    assert.equal(call.headers.get("authorization"), null, "anonymous: no credential");
+  }
+  assert.equal(calls[0].init.cache, undefined, "the disclosure is a public read, left to the cache");
+  assert.equal(calls[1].init.cache, "no-store", "the opt-in is never cached");
+});
+
+test("sms consent: missing fields never reach the network", async () => {
+  const { calls, fetch } = recorder();
+  const client = createStorefrontClient({ baseUrl, publishableKey, fetch });
+  await assert.rejects(client.smsConsent.disclosure(""), /org/);
+  await assert.rejects(client.smsConsent.record({ org: "acme", phone: "", disclosureVersion: "v1" }), /phone/);
+  await assert.rejects(client.smsConsent.record({ org: "acme", phone: "6195550142", disclosureVersion: " " }), /disclosureVersion/);
+  await assert.rejects(client.smsConsent.record({ org: "acme", phone: "6195550142", disclosureVersion: "v1", source: "resident_app" as never }), /source/);
+  assert.equal(calls.length, 0);
+});
